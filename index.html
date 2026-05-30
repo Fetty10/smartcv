@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartCV — Career Services for Nigerians</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+:root {
+  --sky:#0ea5e9; --sky-light:#38bdf8; --sky-dark:#0284c7;
+  --sky-pale:#e0f2fe; --sky-ultra:#f0f9ff;
+  --navy:#0c1a2e; --white:#fff; --gray:#64748b;
+  --gray-light:#f1f5f9; --success:#10b981; --text:#1e293b;
+  --shadow:0 4px 24px rgba(14,165,233,.13);
+  --shadow-lg:0 12px 48px rgba(14,165,233,.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;background:rgba(255,255,255,.93);backdrop-filter:blur(14px);border-bottom:1px solid rgba(14,165,233,.12);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px}
+.logo{font-family:'Sora',sans-serif;font-weight:800;font-size:1.35rem;color:var(--navy);display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo span{color:var(--sky)}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));border-radius:9px;display:grid;place-items:center;font-size:1rem}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--gray);font-size:.92rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--sky)}
+.nav-cta{background:var(--sky);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,transform .15s}
+.nav-cta:hover{background:var(--sky-dark);transform:translateY(-1px)}
+
+/* SERVICES / HERO */
+@keyframes fadeUp2{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp3{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+section{padding:90px 5%}
+.services{background:linear-gradient(160deg,var(--sky-ultra) 0%,#dbeafe 40%,var(--sky-pale) 100%);position:relative;overflow:hidden;padding-top:140px}
+.services::before{content:'';position:absolute;top:-80px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(14,165,233,.15) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.services::after{content:'';position:absolute;bottom:-100px;left:-60px;width:400px;height:400px;background:radial-gradient(circle,rgba(56,189,248,.12) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.services-header{margin-bottom:56px;position:relative;z-index:1;text-align:center}
+.services-header h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(2.2rem,5vw,3.6rem);color:var(--navy);line-height:1.12;margin-bottom:18px;animation:fadeUp2 .7s .05s ease both}
+.services-header h2 em{font-style:normal;color:var(--sky)}
+.services-header p{font-size:1.08rem;color:var(--gray);line-height:1.7;max-width:580px;margin:0 auto 56px;animation:fadeUp3 .7s .15s ease both}
+.services-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px}
+.service-card{background:#fff;border:1.5px solid #e2eaf3;border-radius:22px;padding:36px 30px;transition:transform .25s,box-shadow .25s,border-color .25s;position:relative;overflow:hidden}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--sky),var(--sky-light));transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.service-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--sky-light)}
+.service-card:hover::before{transform:scaleX(1)}
+.service-icon{width:56px;height:56px;background:var(--sky-pale);border-radius:16px;display:grid;place-items:center;font-size:1.6rem;margin-bottom:20px}
+.service-card h3{font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;color:var(--navy);margin-bottom:10px}
+.service-card p{font-size:.88rem;color:var(--gray);line-height:1.65;margin-bottom:22px}
+.service-card .price{font-family:'Sora',sans-serif;font-weight:800;font-size:1.5rem;color:var(--sky-dark)}
+.service-card .price span{font-size:.8rem;font-weight:400;color:var(--gray)}
+.service-features{list-style:none;margin:14px 0 22px}
+.service-features li{font-size:.84rem;color:var(--gray);padding:4px 0;display:flex;align-items:center;gap:8px}
+.service-features li::before{content:'✓';color:var(--success);font-weight:700;flex-shrink:0}
+.btn-service{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));color:#fff;border:none;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .15s}
+.btn-service:hover{opacity:.88;transform:translateY(-1px)}
+
+/* FAQ */
+.faq{background:var(--navy)}
+.faq-header{text-align:center;margin-bottom:52px}
+.faq-header .section-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(1.9rem,3.5vw,2.8rem);color:#fff;line-height:1.2;margin-bottom:14px}
+.faq-header .section-sub{font-size:1rem;color:rgba(255,255,255,.65);max-width:540px;line-height:1.7;margin:0 auto}
+.faq-list{max-width:680px;margin:0 auto}
+.faq-item{background:rgba(255,255,255,.06);border-radius:14px;margin-bottom:12px;border:1px solid rgba(14,165,233,.25);overflow:hidden}
+.faq-q{width:100%;text-align:left;padding:18px 22px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:space-between;transition:background .2s}
+.faq-q:hover{background:rgba(14,165,233,.1)}
+.faq-q .chevron{font-size:.8rem;color:var(--sky-light);transition:transform .3s;flex-shrink:0;margin-left:12px}
+.faq-q.open .chevron{transform:rotate(180deg)}
+.faq-a{padding:0 22px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease}
+.faq-a.open{max-height:220px;padding:0 22px 18px}
+.faq-a p{font-size:.88rem;color:rgba(255,255,255,.7);line-height:1.7}
+
+/* FOOTER */
+footer{background:#060f1c;color:rgba(255,255,255,.7);text-align:center;padding:38px 5%;font-size:.85rem;border-top:1px solid rgba(14,165,233,.15)}
+footer strong{color:#fff;font-family:'Sora',sans-serif}
+footer a{color:var(--sky-light);text-decoration:none}
+
+/* MODAL OVERLAY */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(12,26,46,.65);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:24px;width:100%;max-width:620px;max-height:93vh;overflow-y:auto;padding:40px;box-shadow:0 30px 80px rgba(0,0,0,.2);animation:slideUp .3s ease;position:relative}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-close{position:absolute;top:18px;right:20px;background:#f1f5f9;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:1.1rem;display:grid;place-items:center;color:var(--gray);transition:background .2s;z-index:10}
+.modal-close:hover{background:#e2eaf3}
+.modal-icon{font-size:2.5rem;margin-bottom:12px}
+.modal h2{font-family:'Sora',sans-serif;font-weight:800;font-size:1.5rem;color:var(--navy);margin-bottom:6px}
+.modal-subtitle{color:var(--gray);font-size:.9rem;margin-bottom:28px}
+
+/* FORM */
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:6px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 14px;border:1.5px solid #d1dae6;border-radius:11px;font-size:.93rem;font-family:'DM Sans',sans-serif;color:var(--text);background:#f1f5f9;transition:border-color .2s,background .2s;outline:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--sky);background:#fff}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.upload-zone{border:2px dashed var(--sky-light);border-radius:12px;padding:22px;text-align:center;cursor:pointer;background:var(--sky-ultra);transition:border-color .2s,background .2s}
+.upload-zone:hover{border-color:var(--sky);background:var(--sky-pale)}
+.upload-zone p{font-size:.85rem;color:var(--gray);margin-top:8px}
+.upload-zone .upload-icon{font-size:2rem;color:var(--sky)}
+.upload-zone input[type=file]{display:none}
+.tabs{display:flex;gap:6px;margin-bottom:24px;background:#f1f5f9;border-radius:12px;padding:5px}
+.tab-btn{flex:1;padding:9px;border:none;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray);background:transparent;transition:background .2s,color .2s}
+.tab-btn.active{background:#fff;color:var(--sky-dark);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* DYNAMIC ROWS (+/- education & experience) */
+.dynamic-section{margin-bottom:18px}
+.dynamic-section-label{font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.btn-add{background:var(--sky-ultra);border:1.5px solid var(--sky-light);color:var(--sky-dark);border-radius:8px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
+.btn-add:hover{background:var(--sky-pale)}
+.dynamic-row{background:#f8fbff;border:1.5px solid #e2eaf3;border-radius:12px;padding:14px;margin-bottom:10px;position:relative}
+.dynamic-row .btn-remove{position:absolute;top:10px;right:10px;background:#fee2e2;border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:.85rem;color:#dc2626;display:grid;place-items:center}
+.dynamic-row .btn-remove:hover{background:#fca5a5}
+
+/* TEMPLATE PICKER */
+.template-picker{margin-bottom:22px}
+.template-picker label{display:block;font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:10px}
+.template-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tpl-card{border:2px solid #e2eaf3;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fff}
+.tpl-card:hover{border-color:var(--sky-light);background:var(--sky-ultra)}
+.tpl-card.selected{border-color:var(--sky);background:var(--sky-pale)}
+.tpl-preview{height:70px;border-radius:7px;margin-bottom:8px;display:flex;flex-direction:column;gap:4px;padding:8px;overflow:hidden}
+.tpl-line{height:5px;border-radius:3px;background:#cbd5e1}
+.tpl-line.accent{background:var(--sky-light)}
+.tpl-line.dark{background:#94a3b8}
+.tpl-name{font-size:.78rem;font-weight:700;color:var(--navy)}
+
+/* Classic template preview */
+.tpl-classic{background:#fff;border:1px solid #e2eaf3}
+.tpl-classic .tpl-line:first-child{width:60%;background:#1e293b}
+/* Modern template preview */
+.tpl-modern{background:#f0f9ff}
+.tpl-modern .tpl-line:first-child{width:70%;background:var(--sky-dark)}
+/* Bold template preview */
+.tpl-bold{background:#0c1a2e}
+.tpl-bold .tpl-line{background:rgba(255,255,255,.3)}
+.tpl-bold .tpl-line:first-child{background:#fff;width:55%}
+
+/* PAY BAR */
+.pay-bar{margin-top:28px;background:linear-gradient(135deg,var(--sky-ultra),var(--sky-pale));border:1.5px solid var(--sky-light);border-radius:14px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.pay-bar .amount{font-family:'Sora',sans-serif;font-weight:800;font-size:1.4rem;color:var(--sky-dark)}
+.pay-bar .amount small{font-size:.78rem;font-weight:400;color:var(--gray);display:block}
+.btn-pay{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:11px;padding:13px 28px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .15s;display:flex;align-items:center;gap:8px}
+.btn-pay:hover{opacity:.88;transform:translateY(-1px)}
+.btn-pay:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.secure-note{font-size:.76rem;color:var(--gray);margin-top:10px;text-align:center}
+
+/* GENERATING */
+.generating{text-align:center;padding:30px 0}
+.gen-icon{font-size:3rem;animation:bounce 1s infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.gen-bar{width:100%;height:6px;background:var(--sky-pale);border-radius:50px;margin:20px 0 10px;overflow:hidden}
+.gen-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--sky-light));border-radius:50px;width:0;transition:width 3s ease}
+.gen-text{font-size:.88rem;color:var(--gray)}
+
+/* PREVIEW STEP */
+.preview-step{padding:4px 0}
+.preview-step h3{font-family:'Sora',sans-serif;font-weight:800;font-size:1.2rem;color:var(--navy);margin-bottom:4px}
+.preview-step .preview-note{font-size:.82rem;color:var(--gray);margin-bottom:16px}
+.preview-wrap{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid #e2eaf3;max-height:360px}
+.preview-content{background:#fff;padding:24px;font-size:.82rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:hidden;filter:blur(4px);user-select:none;-webkit-user-select:none}
+.preview-watermark{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;pointer-events:none}
+.wm-text{font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem;color:rgba(14,165,233,.55);transform:rotate(-30deg);letter-spacing:.08em;white-space:nowrap;text-shadow:0 0 20px rgba(14,165,233,.2)}
+.wm-repeat{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:absolute;inset:0;padding:20px;pointer-events:none}
+.wm-repeat span{font-family:'Sora',sans-serif;font-weight:700;font-size:.72rem;color:rgba(14,165,233,.35);transform:rotate(-25deg);display:block;white-space:nowrap}
+.preview-cta{margin-top:18px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));border-radius:14px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.preview-cta .cta-text h4{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:3px}
+.preview-cta .cta-text p{font-size:.8rem;color:rgba(255,255,255,.8)}
+.btn-pay-now{background:#fff;color:var(--sky-dark);border:none;border-radius:11px;padding:13px 26px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .15s;white-space:nowrap}
+.btn-pay-now:hover{opacity:.88;transform:translateY(-1px)}
+.btn-back{background:none;border:none;color:rgba(255,255,255,.8);font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;text-decoration:underline;display:block}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:20px 0}
+.success-screen .check{width:72px;height:72px;background:linear-gradient(135deg,var(--success),#059669);border-radius:50%;display:grid;place-items:center;font-size:2rem;margin:0 auto 20px;animation:popIn .4s ease}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.success-screen h3{font-family:'Sora',sans-serif;font-weight:800;font-size:1.4rem;color:var(--navy);margin-bottom:10px}
+.success-screen p{color:var(--gray);font-size:.92rem;margin-bottom:24px}
+.btn-download{background:linear-gradient(135deg,var(--sky),var(--sky-dark));color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:10px;transition:transform .15s,box-shadow .2s}
+.btn-download:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+
+/* ERROR */
+.error-box{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:14px 18px;margin-top:14px;font-size:.87rem;color:#dc2626;line-height:1.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:640px){
+  .nav-links{display:none}
+  .form-row{grid-template-columns:1fr}
+  .template-options{grid-template-columns:repeat(3,1fr)}
+  .pay-bar,.preview-cta{flex-direction:column;text-align:center}
+  .modal{padding:28px 18px}
+  .wm-repeat{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo"><div class="logo-icon">🚀</div>Smart<span>CV</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Get Started</button>
+</nav>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="services-header">
+    <h2>Your Dream Job Starts With a <em>Smart CV</em></h2>
+    <p>Fill in your details or upload your old CV and download a world-class CV, cover letter, LinkedIn profile or interview prep instantly.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">📄</div>
+      <h3>CV Writer</h3>
+      <p>Upload your old CV or fill in your experience — get a polished, professional CV that stands out to Nigerian and international employers.</p>
+      <ul class="service-features">
+        <li>Professional formatting & layout</li>
+        <li>Tailored to your industry</li>
+        <li>Choose from 3 templates</li>
+        <li>Instant PDF download</li>
+      </ul>
+      <div class="price">₦5,000 <span>one-time</span></div><br>
+      <button class="btn-service" onclick="openModal('cv')">Build My CV →</button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">✉️</div>
+      <h3>Cover Letter Generator</h3>
+      <p>Paste a job description and your background — get a compelling, personalized cover letter that gets you noticed by employers.</p>
+      <ul class="service-features">
+        <li>Tailored to specific job role</li>
+        <li>Professional tone & structure</li>
+        <li>Highlights your strengths</li>
+        <li>Instant PDF download</li>
+      </ul>
+      <div class="price">₦5,000 <span>one-time</span></div><br>
+      <button class="btn-service" onclick="openModal('cover')">Write My Letter →</button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🎯</div>
+      <h3>Interview Prep Guide</h3>
+      <p>Tell us the job you applied for — get a custom guide with likely interview questions, model answers, and tips to ace your interview.</p>
+      <ul class="service-features">
+        <li>Top 20 likely questions</li>
+        <li>Sample strong answers</li>
+        <li>Salary negotiation tips</li>
+        <li>Instant PDF download</li>
+      </ul>
+      <div class="price">₦5,000 <span>one-time</span></div><br>
+      <button class="btn-service" onclick="openModal('interview')">Prep Me →</button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">💼</div>
+      <h3>LinkedIn Profile Optimizer</h3>
+      <p>Enter your current LinkedIn details — we rewrite your headline, summary, and experience sections to attract recruiters.</p>
+      <ul class="service-features">
+        <li>Keyword-rich headline & summary</li>
+        <li>Experience section rewrite</li>
+        <li>Skills & endorsement tips</li>
+        <li>Instant PDF download</li>
+      </ul>
+      <div class="price">₦5,000 <span>one-time</span></div><br>
+      <button class="btn-service" onclick="openModal('linkedin')">Optimize Profile →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="faq-header">
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub">Quick answers to things students and job seekers usually ask us.</p>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">How do I pay? <span class="chevron">▼</span></button>
+      <div class="faq-a"><p>You pay ₦5,000 via Paystack — use your GTBank, Access, Zenith, or any Nigerian debit card, do a bank transfer, or use USSD (*737#, *919#, etc.). No foreign card needed.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I see my document before paying? <span class="chevron">▼</span></button>
+      <div class="faq-a"><p>Yes! We generate a blurred preview of your document first. You can see it's been created specifically for you — then pay ₦5,000 to unlock the full clean PDF download.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">When will I get my document? <span class="chevron">▼</span></button>
+      <div class="faq-a"><p>Immediately after payment is confirmed. The PDF download button appears on the screen right away.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I use it for any job or industry? <span class="chevron">▼</span></button>
+      <div class="faq-a"><p>Yes! The service adapts to your specific industry — banking, tech, oil & gas, NGOs, teaching, healthcare, and more.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">What if I don't have an existing CV? <span class="chevron">▼</span></button>
+      <div class="faq-a"><p>No problem. Just fill in the simple form with your name, education, skills, and experience. You don't need to upload anything.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Is there a subscription or hidden charge? <span class="chevron">▼</span></button>
+      <div class="faq-a"><p>No subscription, no hidden charges. You pay ₦5,000 once per service. Each service is a separate one-time payment.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>SmartCV</strong> — Career Services for Nigerians</p>
+  <p style="margin-top:8px">Questions? <a href="#">WhatsApp Us</a> &nbsp;|&nbsp; <a href="#">Email Support</a></p>
+  <p style="margin-top:14px;font-size:.78rem;opacity:.5">© 2025 SmartCV. All rights reserved.</p>
+</footer>
+
+<!-- ═══════════════ CV MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-cv">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('cv')">✕</button>
+
+    <!-- STEP: FORM -->
+    <div id="cv-step-form">
+      <div class="modal-icon">📄</div>
+      <h2>CV Writer</h2>
+      <p class="modal-subtitle">Fill in your details or upload an old CV. Then pick a template and preview before paying.</p>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'cv-fill')">Fill in Details</button>
+        <button class="tab-btn" onclick="switchTab(this,'cv-upload')">Upload Old CV</button>
+      </div>
+
+      <!-- FILL TAB -->
+      <div id="cv-fill" class="tab-panel active">
+        <div class="form-row">
+          <div class="form-group"><label>Full Name *</label><input id="cv-name" type="text" placeholder="e.g. Chidi Okonkwo"></div>
+          <div class="form-group"><label>Phone Number</label><input id="cv-phone" type="tel" placeholder="08012345678"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email Address *</label><input id="cv-email" type="email" placeholder="yourname@gmail.com"></div>
+          <div class="form-group"><label>Industry / Field *</label><input id="cv-industry" type="text" placeholder="e.g. Banking, Tech, NGO"></div>
+        </div>
+        <div class="form-group"><label>Years of Experience</label>
+          <select id="cv-exp"><option>Student / Fresh Graduate</option><option>1–2 years</option><option>3–5 years</option><option>6–10 years</option><option>10+ years</option></select>
+        </div>
+
+        <!-- DYNAMIC EDUCATION -->
+        <div class="dynamic-section">
+          <div class="dynamic-section-label">
+            <span>Education</span>
+            <button class="btn-add" onclick="addRow('cv-edu-list','edu')">+ Add Education</button>
+          </div>
+          <div id="cv-edu-list">
+            <div class="dynamic-row">
+              <button class="btn-remove" onclick="removeRow(this)" title="Remove">✕</button>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:0"><label>Degree / Certificate</label><input type="text" placeholder="e.g. B.Sc Computer Science"></div>
+                <div class="form-group" style="margin-bottom:0"><label>School & Year</label><input type="text" placeholder="e.g. UNILAG, 2023"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DYNAMIC EXPERIENCE -->
+        <div class="dynamic-section">
+          <div class="dynamic-section-label">
+            <span>Work Experience</span>
+            <button class="btn-add" onclick="addRow('cv-exp-list','exp')">+ Add Experience</button>
+          </div>
+          <div id="cv-exp-list">
+            <div class="dynamic-row">
+              <button class="btn-remove" onclick="removeRow(this)" title="Remove">✕</button>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:8px"><label>Job Title</label><input type="text" placeholder="e.g. Marketing Officer"></div>
+                <div class="form-group" style="margin-bottom:8px"><label>Company & Years</label><input type="text" placeholder="e.g. GTBank, 2021–2023"></div>
+              </div>
+              <div class="form-group" style="margin-bottom:0"><label>Key Responsibilities</label><textarea placeholder="What did you do in this role?" style="min-height:60px"></textarea></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group"><label>Key Skills</label><input id="cv-skills" type="text" placeholder="e.g. Python, Excel, Project Management, Leadership"></div>
+      </div>
+
+      <!-- UPLOAD TAB -->
+      <div id="cv-upload" class="tab-panel">
+        <div class="upload-zone" onclick="document.getElementById('cv-file').click()">
+          <div class="upload-icon">📎</div>
+          <strong>Click to upload your CV</strong>
+          <p>PDF or Word document (.pdf, .doc, .docx)</p>
+          <input type="file" id="cv-file" accept=".pdf,.doc,.docx">
+        </div>
+        <div class="form-group" style="margin-top:16px"><label>Your Name *</label><input id="cv-name2" type="text" placeholder="e.g. Chidi Okonkwo"></div>
+        <div class="form-group"><label>Email *</label><input id="cv-email2" type="email" placeholder="yourname@gmail.com"></div>
+        <div class="form-group"><label>Job you're targeting (optional)</label><input id="cv-target" type="text" placeholder="e.g. Marketing Manager at a FMCG company"></div>
+      </div>
+
+      <!-- TEMPLATE PICKER -->
+      <div class="template-picker">
+        <label>Choose a CV Template</label>
+        <div class="template-options">
+          <div class="tpl-card selected" onclick="selectTemplate(this,'classic')" data-tpl="classic">
+            <div class="tpl-preview tpl-classic">
+              <div class="tpl-line" style="width:60%;background:#1e293b"></div>
+              <div class="tpl-line" style="width:40%;background:#64748b;height:3px"></div>
+              <div class="tpl-line accent" style="width:100%;height:2px;margin-top:4px"></div>
+              <div class="tpl-line" style="width:80%"></div>
+              <div class="tpl-line" style="width:70%"></div>
+              <div class="tpl-line" style="width:60%"></div>
+            </div>
+            <div class="tpl-name">Classic</div>
+          </div>
+          <div class="tpl-card" onclick="selectTemplate(this,'modern')" data-tpl="modern">
+            <div class="tpl-preview tpl-modern">
+              <div class="tpl-line" style="width:65%;background:var(--sky-dark)"></div>
+              <div class="tpl-line" style="width:45%;background:var(--sky-light);height:3px"></div>
+              <div class="tpl-line" style="width:85%;margin-top:4px"></div>
+              <div class="tpl-line" style="width:75%"></div>
+              <div class="tpl-line accent" style="width:40%;height:3px;margin-top:4px"></div>
+              <div class="tpl-line" style="width:80%"></div>
+            </div>
+            <div class="tpl-name">Modern</div>
+          </div>
+          <div class="tpl-card" onclick="selectTemplate(this,'bold')" data-tpl="bold">
+            <div class="tpl-preview tpl-bold">
+              <div class="tpl-line" style="width:70%;background:#fff"></div>
+              <div class="tpl-line" style="width:50%;background:var(--sky-light);height:3px"></div>
+              <div class="tpl-line" style="width:90%;background:rgba(255,255,255,.3);margin-top:4px"></div>
+              <div class="tpl-line" style="width:80%;background:rgba(255,255,255,.3)"></div>
+              <div class="tpl-line" style="width:60%;background:rgba(255,255,255,.3)"></div>
+            </div>
+            <div class="tpl-name">Bold</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cv-error" class="error-box" style="display:none"></div>
+      <div class="pay-bar">
+        <div class="amount"><small>Service Total</small>₦5,000</div>
+        <button class="btn-pay" id="cv-pay-btn" onclick="startGenerate('cv')">✨ Preview My CV</button>
+      </div>
+      <p class="secure-note">Preview generated first · Pay ₦5,000 to download · Secured by Paystack</p>
+    </div>
+
+    <!-- STEP: GENERATING -->
+    <div id="cv-step-generating" style="display:none">
+      <div class="generating">
+        <div class="gen-icon">📄</div>
+        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Building Your CV...</h3>
+        <p style="color:var(--gray);font-size:.88rem">Crafting your professional CV. Please wait a moment.</p>
+        <div class="gen-bar"><div class="gen-fill" id="cv-bar"></div></div>
+        <p class="gen-text" id="cv-gen-text">Analysing your details...</p>
+      </div>
+    </div>
+
+    <!-- STEP: PREVIEW -->
+    <div id="cv-step-preview" style="display:none">
+      <div class="preview-step">
+        <h3>Your CV Preview 👀</h3>
+        <p class="preview-note">Your CV has been created. Pay ₦5,000 to unlock and download the full clean PDF.</p>
+        <div class="preview-wrap">
+          <div class="preview-content" id="cv-preview-content"></div>
+          <div class="preview-watermark">
+            <div class="wm-repeat">
+              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-cta">
+          <div class="cta-text">
+            <h4>🔓 Unlock Full CV — ₦5,000</h4>
+            <p>Pay once, download instantly. No subscription.</p>
+          </div>
+          <button class="btn-pay-now" onclick="paystackCheckout('cv')">🔒 Pay ₦5,000 Now</button>
+        </div>
+        <button class="btn-back" onclick="showStep('cv','form')">← Edit my details</button>
+      </div>
+    </div>
+
+    <!-- STEP: SUCCESS -->
+    <div id="cv-step-success" style="display:none">
+      <div class="success-screen">
+        <div class="check">✓</div>
+        <h3>Your CV is Ready! 🎉</h3>
+        <p>Payment confirmed! Your professional CV is ready to download.</p>
+        <button class="btn-download" id="cv-download-btn">⬇ Download CV PDF</button>
+        <p style="margin-top:16px;font-size:.78rem;color:var(--gray)">Save to your phone or Google Drive immediately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ COVER LETTER MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-cover">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('cover')">✕</button>
+    <div id="cover-step-form">
+      <div class="modal-icon">✉️</div>
+      <h2>Cover Letter Generator</h2>
+      <p class="modal-subtitle">Tell us about the job and yourself — preview your letter then pay to download.</p>
+      <div class="form-group"><label>Your Full Name *</label><input id="cl-name" type="text" placeholder="e.g. Adaeze Nwosu"></div>
+      <div class="form-group"><label>Email Address *</label><input id="cl-email" type="email" placeholder="yourname@gmail.com"></div>
+      <div class="form-group"><label>Job Title You're Applying For *</label><input id="cl-jobtitle" type="text" placeholder="e.g. Software Engineer at Flutterwave"></div>
+      <div class="form-group"><label>Paste the Job Description *</label><textarea id="cl-jd" placeholder="Copy and paste the job description from the job posting here..."></textarea></div>
+      <div class="form-group"><label>Your Key Qualifications & Experience</label><textarea id="cl-qual" placeholder="e.g. 3 years in fintech, B.Sc Software Engineering, strong React and Node.js skills..."></textarea></div>
+      <div class="form-group"><label>Why do you want this job? (optional)</label><input id="cl-why" type="text" placeholder="e.g. Passionate about fintech, admire the company's mission..."></div>
+      <div id="cover-error" class="error-box" style="display:none"></div>
+      <div class="pay-bar">
+        <div class="amount"><small>Service Total</small>₦5,000</div>
+        <button class="btn-pay" id="cover-pay-btn" onclick="startGenerate('cover')">✨ Preview My Letter</button>
+      </div>
+      <p class="secure-note">Preview generated first · Pay ₦5,000 to download · Secured by Paystack</p>
+    </div>
+    <div id="cover-step-generating" style="display:none">
+      <div class="generating">
+        <div class="gen-icon">✉️</div>
+        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Writing Your Cover Letter...</h3>
+        <p style="color:var(--gray);font-size:.88rem">Crafting a personalized letter tailored to the job.</p>
+        <div class="gen-bar"><div class="gen-fill" id="cover-bar"></div></div>
+        <p class="gen-text">Matching your strengths to the job requirements...</p>
+      </div>
+    </div>
+    <div id="cover-step-preview" style="display:none">
+      <div class="preview-step">
+        <h3>Your Cover Letter Preview 👀</h3>
+        <p class="preview-note">Your cover letter has been written. Pay ₦5,000 to unlock and download the full clean PDF.</p>
+        <div class="preview-wrap">
+          <div class="preview-content" id="cover-preview-content"></div>
+          <div class="preview-watermark"><div class="wm-repeat">
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+          </div></div>
+        </div>
+        <div class="preview-cta">
+          <div class="cta-text"><h4>🔓 Unlock Full Letter — ₦5,000</h4><p>Pay once, download instantly. No subscription.</p></div>
+          <button class="btn-pay-now" onclick="paystackCheckout('cover')">🔒 Pay ₦5,000 Now</button>
+        </div>
+        <button class="btn-back" onclick="showStep('cover','form')">← Edit my details</button>
+      </div>
+    </div>
+    <div id="cover-step-success" style="display:none">
+      <div class="success-screen">
+        <div class="check">✓</div>
+        <h3>Cover Letter Ready! 🎉</h3>
+        <p>Payment confirmed! Your cover letter is ready to download.</p>
+        <button class="btn-download" id="cover-download-btn">⬇ Download Cover Letter PDF</button>
+        <p style="margin-top:16px;font-size:.78rem;color:var(--gray)">Save to your phone or Google Drive immediately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ INTERVIEW MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-interview">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('interview')">✕</button>
+    <div id="interview-step-form">
+      <div class="modal-icon">🎯</div>
+      <h2>Interview Prep Guide</h2>
+      <p class="modal-subtitle">Tell us the job — preview your guide then pay to download.</p>
+      <div class="form-group"><label>Your Full Name *</label><input id="ip-name" type="text" placeholder="e.g. Emeka Eze"></div>
+      <div class="form-group"><label>Job Title & Company *</label><input id="ip-job" type="text" placeholder="e.g. Business Analyst at GTBank"></div>
+      <div class="form-group"><label>Industry / Sector *</label><input id="ip-industry" type="text" placeholder="e.g. Banking, Oil & Gas, Tech Startup, NGO"></div>
+      <div class="form-group"><label>Your Level of Experience</label>
+        <select id="ip-level"><option>Student / NYSC</option><option>Fresh Graduate (0–1 yr)</option><option>1–3 years experience</option><option>3–7 years experience</option><option>Senior / Management level</option></select>
+      </div>
+      <div class="form-group"><label>Paste Job Description (optional but recommended)</label><textarea id="ip-jd" placeholder="Paste the job posting here for more targeted preparation..."></textarea></div>
+      <div class="form-group"><label>Your Biggest Worry About the Interview (optional)</label><input id="ip-worry" type="text" placeholder="e.g. salary negotiation, technical questions, group exercises..."></div>
+      <div id="interview-error" class="error-box" style="display:none"></div>
+      <div class="pay-bar">
+        <div class="amount"><small>Service Total</small>₦5,000</div>
+        <button class="btn-pay" id="interview-pay-btn" onclick="startGenerate('interview')">✨ Preview My Guide</button>
+      </div>
+      <p class="secure-note">Preview generated first · Pay ₦5,000 to download · Secured by Paystack</p>
+    </div>
+    <div id="interview-step-generating" style="display:none">
+      <div class="generating">
+        <div class="gen-icon">🎯</div>
+        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Building Your Prep Guide...</h3>
+        <p style="color:var(--gray);font-size:.88rem">Preparing your personalised interview questions and answers.</p>
+        <div class="gen-bar"><div class="gen-fill" id="interview-bar"></div></div>
+        <p class="gen-text">Generating role-specific questions and model answers...</p>
+      </div>
+    </div>
+    <div id="interview-step-preview" style="display:none">
+      <div class="preview-step">
+        <h3>Your Interview Guide Preview 👀</h3>
+        <p class="preview-note">Your prep guide has been created. Pay ₦5,000 to unlock and download the full clean PDF.</p>
+        <div class="preview-wrap">
+          <div class="preview-content" id="interview-preview-content"></div>
+          <div class="preview-watermark"><div class="wm-repeat">
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+          </div></div>
+        </div>
+        <div class="preview-cta">
+          <div class="cta-text"><h4>🔓 Unlock Full Guide — ₦5,000</h4><p>Pay once, download instantly. No subscription.</p></div>
+          <button class="btn-pay-now" onclick="paystackCheckout('interview')">🔒 Pay ₦5,000 Now</button>
+        </div>
+        <button class="btn-back" onclick="showStep('interview','form')">← Edit my details</button>
+      </div>
+    </div>
+    <div id="interview-step-success" style="display:none">
+      <div class="success-screen">
+        <div class="check">✓</div>
+        <h3>Interview Guide Ready! 🎉</h3>
+        <p>Payment confirmed! Your interview prep guide is ready to download.</p>
+        <button class="btn-download" id="interview-download-btn">⬇ Download Interview Guide PDF</button>
+        <p style="margin-top:16px;font-size:.78rem;color:var(--gray)">Save to your phone or Google Drive immediately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LINKEDIN MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-linkedin">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('linkedin')">✕</button>
+    <div id="linkedin-step-form">
+      <div class="modal-icon">💼</div>
+      <h2>LinkedIn Profile Optimizer</h2>
+      <p class="modal-subtitle">Enter your details — preview your optimized profile then pay to download.</p>
+      <div class="form-group"><label>Your Full Name *</label><input id="li-name" type="text" placeholder="e.g. Ngozi Adeleke"></div>
+      <div class="form-group"><label>Current Job Title / Target Role *</label><input id="li-title" type="text" placeholder="e.g. Mechanical Engineer seeking Project Manager roles"></div>
+      <div class="form-group"><label>Industry *</label><input id="li-industry" type="text" placeholder="e.g. Oil & Gas, Healthcare, Finance, Technology"></div>
+      <div class="form-group"><label>Your Current LinkedIn Headline (if any)</label><input id="li-headline" type="text" placeholder="e.g. Engineer | Problem Solver | NNPC"></div>
+      <div class="form-group"><label>Current LinkedIn About / Summary</label><textarea id="li-summary" placeholder="Paste your current About section here, or describe yourself briefly..."></textarea></div>
+      <div class="form-group"><label>Top Skills & Accomplishments</label><textarea id="li-skills" placeholder="e.g. Managed ₦50M project, AWS certified, Led team of 12, increased revenue by 30%..."></textarea></div>
+      <div class="form-group"><label>Type of Opportunities You Want</label><input id="li-opps" type="text" placeholder="e.g. Remote work, Mid-level roles, International companies, FMCG sector"></div>
+      <div id="linkedin-error" class="error-box" style="display:none"></div>
+      <div class="pay-bar">
+        <div class="amount"><small>Service Total</small>₦5,000</div>
+        <button class="btn-pay" id="linkedin-pay-btn" onclick="startGenerate('linkedin')">✨ Preview My Profile</button>
+      </div>
+      <p class="secure-note">Preview generated first · Pay ₦5,000 to download · Secured by Paystack</p>
+    </div>
+    <div id="linkedin-step-generating" style="display:none">
+      <div class="generating">
+        <div class="gen-icon">💼</div>
+        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Optimizing Your Profile...</h3>
+        <p style="color:var(--gray);font-size:.88rem">Crafting recruiter-friendly LinkedIn content for you.</p>
+        <div class="gen-bar"><div class="gen-fill" id="linkedin-bar"></div></div>
+        <p class="gen-text">Writing your headline, summary and experience sections...</p>
+      </div>
+    </div>
+    <div id="linkedin-step-preview" style="display:none">
+      <div class="preview-step">
+        <h3>Your LinkedIn Preview 👀</h3>
+        <p class="preview-note">Your optimized profile content is ready. Pay ₦5,000 to unlock and download the full clean PDF.</p>
+        <div class="preview-wrap">
+          <div class="preview-content" id="linkedin-preview-content"></div>
+          <div class="preview-watermark"><div class="wm-repeat">
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
+          </div></div>
+        </div>
+        <div class="preview-cta">
+          <div class="cta-text"><h4>🔓 Unlock Full Profile Guide — ₦5,000</h4><p>Pay once, download instantly. No subscription.</p></div>
+          <button class="btn-pay-now" onclick="paystackCheckout('linkedin')">🔒 Pay ₦5,000 Now</button>
+        </div>
+        <button class="btn-back" onclick="showStep('linkedin','form')">← Edit my details</button>
+      </div>
+    </div>
+    <div id="linkedin-step-success" style="display:none">
+      <div class="success-screen">
+        <div class="check">✓</div>
+        <h3>Profile Optimized! 🎉</h3>
+        <p>Payment confirmed! Your LinkedIn optimization guide is ready to download.</p>
+        <button class="btn-download" id="linkedin-download-btn">⬇ Download LinkedIn Guide PDF</button>
+        <p style="margin-top:16px;font-size:.78rem;color:var(--gray)">Save to your phone or Google Drive immediately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG — replace with your real values ─────────────────────
+const PAYSTACK_PUBLIC_KEY = 'pk_test_YOUR_PAYSTACK_PUBLIC_KEY';
+const AMOUNT_KOBO = 500000; // ₦5,000 in kobo
+
+// ─── State ──────────────────────────────────────────────────────
+const generatedContent = {};
+let selectedTemplate = { cv: 'classic', cover: 'classic', interview: 'classic', linkedin: 'classic' };
+
+// ─── Modal helpers ───────────────────────────────────────────────
+function openModal(type) {
+  document.getElementById('modal-' + type).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+  document.body.style.overflow = '';
+  showStep(type, 'form');
+  hideError(type);
+  resetPayBtn(type);
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) { const t = o.id.replace('modal-',''); closeModal(t); }});
+});
+
+function showStep(type, step) {
+  ['form','generating','preview','success'].forEach(s => {
+    const el = document.getElementById(type + '-step-' + s);
+    if (el) el.style.display = 'none';
+  });
+  const el = document.getElementById(type + '-step-' + step);
+  if (el) el.style.display = 'block';
+  // scroll modal to top
+  const modal = document.querySelector('#modal-' + type + ' .modal');
+  if (modal) modal.scrollTop = 0;
+}
+function showError(type, msg) {
+  const el = document.getElementById(type + '-error');
+  if (el) { el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
+}
+function hideError(type) {
+  const el = document.getElementById(type + '-error');
+  if (el) el.style.display = 'none';
+}
+function resetPayBtn(type) {
+  const btn = document.getElementById(type + '-pay-btn');
+  const labels = { cv:'✨ Preview My CV', cover:'✨ Preview My Letter', interview:'✨ Preview My Guide', linkedin:'✨ Preview My Profile' };
+  if (btn) { btn.disabled = false; btn.innerHTML = labels[type] || '✨ Preview'; }
+}
+function switchTab(btn, panelId) {
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.modal').querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+}
+function toggleFaq(btn) {
+  const a = btn.nextElementSibling, isOpen = a.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(x => x.classList.remove('open'));
+  document.querySelectorAll('.faq-q').forEach(x => x.classList.remove('open'));
+  if (!isOpen) { a.classList.add('open'); btn.classList.add('open'); }
+}
+
+// ─── Template picker ─────────────────────────────────────────────
+function selectTemplate(card, tpl) {
+  card.closest('.template-options').querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedTemplate['cv'] = tpl;
+}
+
+// ─── Dynamic rows (+/-) ──────────────────────────────────────────
+function addRow(listId, type) {
+  const list = document.getElementById(listId);
+  const div = document.createElement('div');
+  div.className = 'dynamic-row';
+  if (type === 'edu') {
+    div.innerHTML = `
+      <button class="btn-remove" onclick="removeRow(this)" title="Remove">✕</button>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0"><label>Degree / Certificate</label><input type="text" placeholder="e.g. HND Accounting"></div>
+        <div class="form-group" style="margin-bottom:0"><label>School & Year</label><input type="text" placeholder="e.g. Yaba Tech, 2022"></div>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <button class="btn-remove" onclick="removeRow(this)" title="Remove">✕</button>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:8px"><label>Job Title</label><input type="text" placeholder="e.g. Sales Executive"></div>
+        <div class="form-group" style="margin-bottom:8px"><label>Company & Years</label><input type="text" placeholder="e.g. Zenith Bank, 2020–2022"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:0"><label>Key Responsibilities</label><textarea placeholder="What did you do in this role?" style="min-height:60px"></textarea></div>`;
+  }
+  list.appendChild(div);
+}
+function removeRow(btn) {
+  const row = btn.closest('.dynamic-row');
+  const list = row.parentElement;
+  if (list.querySelectorAll('.dynamic-row').length > 1) row.remove();
+}
+
+// ─── Collect education & experience from dynamic rows ────────────
+function collectEdu() {
+  const rows = document.querySelectorAll('#cv-edu-list .dynamic-row');
+  return Array.from(rows).map(r => {
+    const inputs = r.querySelectorAll('input');
+    return `${inputs[0]?.value || ''} — ${inputs[1]?.value || ''}`;
+  }).filter(s => s.trim() !== ' — ').join('\n');
+}
+function collectExp() {
+  const rows = document.querySelectorAll('#cv-exp-list .dynamic-row');
+  return Array.from(rows).map(r => {
+    const inputs = r.querySelectorAll('input');
+    const ta = r.querySelector('textarea');
+    return `${inputs[0]?.value || ''} at ${inputs[1]?.value || ''}\n${ta?.value || ''}`;
+  }).filter(s => s.trim().length > 5).join('\n\n');
+}
+
+// ─── Prompt builders ─────────────────────────────────────────────
+function buildPrompt(type) {
+  if (type === 'cv') {
+    const name = document.getElementById('cv-name')?.value.trim() || '';
+    const email = document.getElementById('cv-email')?.value.trim() || '';
+    const industry = document.getElementById('cv-industry')?.value.trim() || '';
+    if (!name || !email || !industry) return null;
+    return `You are a professional CV writer. Create a complete, polished, professional CV. Use section headers in ALL CAPS followed by dashes (------). Plain text only — no markdown symbols.
+
+Name: ${name}
+Phone: ${document.getElementById('cv-phone')?.value.trim() || ''}
+Email: ${email}
+Industry: ${industry}
+Experience Level: ${document.getElementById('cv-exp')?.value || ''}
+Education:\n${collectEdu() || 'Not provided'}
+Work Experience:\n${collectExp() || 'Not provided'}
+Key Skills: ${document.getElementById('cv-skills')?.value.trim() || ''}
+
+Write the complete CV now. Make it professional, concise and impactful. Minimum 400 words.`;
+  }
+  if (type === 'cover') {
+    const name = document.getElementById('cl-name')?.value.trim() || '';
+    const email = document.getElementById('cl-email')?.value.trim() || '';
+    const job = document.getElementById('cl-jobtitle')?.value.trim() || '';
+    if (!name || !email || !job) return null;
+    return `You are a professional cover letter writer. Write a compelling, personalized cover letter. Professional tone. Include greeting, 3 strong paragraphs, professional sign-off. Plain text only.
+
+Applicant: ${name} (${email})
+Job: ${job}
+Job Description: ${document.getElementById('cl-jd')?.value.trim() || 'Not provided'}
+Qualifications: ${document.getElementById('cl-qual')?.value.trim() || 'Not provided'}
+Why this job: ${document.getElementById('cl-why')?.value.trim() || 'Not provided'}
+
+Write the full cover letter now. 300–400 words.`;
+  }
+  if (type === 'interview') {
+    const name = document.getElementById('ip-name')?.value.trim() || '';
+    const job = document.getElementById('ip-job')?.value.trim() || '';
+    if (!name || !job) return null;
+    return `You are an expert interview coach. Create a comprehensive interview prep guide. Structure: 1) ABOUT YOUR INTERVIEW, 2) TOP 20 INTERVIEW QUESTIONS with strong model answers, 3) SALARY NEGOTIATION TIPS, 4) GENERAL INTERVIEW TIPS. Number each question. Plain text only.
+
+Candidate: ${name}
+Job & Company: ${job}
+Industry: ${document.getElementById('ip-industry')?.value.trim() || ''}
+Experience Level: ${document.getElementById('ip-level')?.value || ''}
+Job Description: ${document.getElementById('ip-jd')?.value.trim() || 'Not provided'}
+Main Worry: ${document.getElementById('ip-worry')?.value.trim() || 'None'}
+
+Write the full interview prep guide now.`;
+  }
+  if (type === 'linkedin') {
+    const name = document.getElementById('li-name')?.value.trim() || '';
+    const title = document.getElementById('li-title')?.value.trim() || '';
+    if (!name || !title) return null;
+    return `You are a LinkedIn profile expert. Rewrite and optimize this person's LinkedIn profile. Sections: 1) OPTIMIZED HEADLINE, 2) ABOUT / SUMMARY, 3) EXPERIENCE BULLET POINTS, 4) RECOMMENDED SKILLS, 5) PROFILE TIPS. Plain text only.
+
+Name: ${name}
+Title / Target Role: ${title}
+Industry: ${document.getElementById('li-industry')?.value.trim() || ''}
+Current Headline: ${document.getElementById('li-headline')?.value.trim() || 'None'}
+Current Summary: ${document.getElementById('li-summary')?.value.trim() || 'None'}
+Skills & Accomplishments: ${document.getElementById('li-skills')?.value.trim() || ''}
+Opportunities Wanted: ${document.getElementById('li-opps')?.value.trim() || ''}
+
+Write the full optimized LinkedIn profile content now.`;
+  }
+  return null;
+}
+
+// ─── Sanitize text for jsPDF (strip chars it can't handle) ──────
+function sanitizeForPDF(text) {
+  return text
+    .replace(/\u20A6/g, 'NGN')          // ₦ → NGN
+    .replace(/[\u2018\u2019]/g, "'")     // curly single quotes
+    .replace(/[\u201C\u201D]/g, '"')     // curly double quotes
+    .replace(/\u2014/g, '--')            // em dash
+    .replace(/\u2013/g, '-')             // en dash
+    .replace(/\u2026/g, '...')           // ellipsis
+    .replace(/\u2022/g, '*')             // bullet
+    .replace(/[^\x00-\x7F]/g, function(c) {
+      // replace any remaining non-ASCII with closest ASCII or empty
+      const map = { '\u00e9':'e','\u00e8':'e','\u00ea':'e','\u00eb':'e','\u00e0':'a','\u00e2':'a','\u00f4':'o','\u00f9':'u','\u00fb':'u','\u00fc':'u','\u00ef':'i','\u00ee':'i','\u00e7':'c','\u00f1':'n' };
+      return map[c] || '';
+    });
+}
+
+// ─── API call — works locally (direct) and on Vercel (proxy) ─────
+async function callGenerate(prompt) {
+  // Try Vercel edge function first (production)
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.result) return data.result;
+    }
+  } catch (_) { /* fall through to direct call */ }
+
+  // Fallback: call Anthropic API directly (for local testing)
+  const ANTHROPIC_KEY = window.__SMARTCV_KEY__ || '';
+  if (!ANTHROPIC_KEY) {
+    throw new Error('Not deployed yet. Please set your API key for local testing: open browser console and run: window.__SMARTCV_KEY__ = "sk-ant-..."');
+  }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || 'Generation failed. Please try again.');
+  }
+  const data = await res.json();
+  return data.content?.map(b => b.text || '').join('') || '';
+}
+
+// ─── STEP 1: Generate → show preview ─────────────────────────────
+async function startGenerate(type) {
+  hideError(type);
+  const prompt = buildPrompt(type);
+  if (!prompt) { showError(type, 'Please fill in all required fields marked with *'); return; }
+
+  const btn = document.getElementById(type + '-pay-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle"></span>&nbsp; Generating...'; }
+
+  showStep(type, 'generating');
+  const bar = document.getElementById(type + '-bar');
+  if (bar) setTimeout(() => { bar.style.width = '80%'; }, 100);
+
+  const msgs = ['Analysing your details...','Structuring your document...','Polishing the content...','Almost ready...'];
+  const genEl = document.getElementById(type + '-gen-text');
+  let gi = 0;
+  const ticker = setInterval(() => { gi = (gi + 1) % msgs.length; if (genEl) genEl.textContent = msgs[gi]; }, 2200);
+
+  try {
+    const content = await callGenerate(prompt);
+    clearInterval(ticker);
+    generatedContent[type] = content;
+    if (bar) bar.style.width = '100%';
+    await new Promise(r => setTimeout(r, 300));
+
+    // populate blurred preview
+    const prev = document.getElementById(type + '-preview-content');
+    if (prev) prev.textContent = content;
+
+    showStep(type, 'preview');
+  } catch (err) {
+    clearInterval(ticker);
+    showStep(type, 'form');
+    showError(type, err.message || 'Something went wrong. Please try again.');
+    resetPayBtn(type);
+  }
+}
+
+// ─── STEP 2: Paystack checkout ────────────────────────────────────
+function getEmail(type) {
+  const map = { cv: 'cv-email', cover: 'cl-email', interview: 'ip-name', linkedin: 'li-name' };
+  const emailIds = { cv: 'cv-email', cover: 'cl-email', interview: null, linkedin: null };
+  if (emailIds[type]) return document.getElementById(emailIds[type])?.value.trim() || 'customer@smartcv.ng';
+  return 'customer@smartcv.ng';
+}
+
+function paystackCheckout(type) {
+  const email = getEmail(type);
+  const titles = { cv: 'SmartCV — Professional CV', cover: 'SmartCV — Cover Letter', interview: 'SmartCV — Interview Prep Guide', linkedin: 'SmartCV — LinkedIn Optimizer' };
+
+  const handler = PaystackPop.setup({
+    key: PAYSTACK_PUBLIC_KEY,
+    email: email,
+    amount: AMOUNT_KOBO,
+    currency: 'NGN',
+    ref: 'SCV_' + type.toUpperCase() + '_' + Date.now(),
+    metadata: { service: type, custom_fields: [{ display_name: 'Service', variable_name: 'service', value: titles[type] }] },
+    onClose: function() {
+      // user closed payment — stay on preview
+    },
+    callback: function(response) {
+      // Payment successful
+      onPaymentSuccess(type, response.reference);
+    }
+  });
+  handler.openIframe();
+}
+
+// ─── STEP 3: After payment — show download ────────────────────────
+function onPaymentSuccess(type, reference) {
+  showStep(type, 'success');
+  const titles = { cv: 'Professional CV', cover: 'Cover Letter', interview: 'Interview Prep Guide', linkedin: 'LinkedIn Profile Optimizer' };
+  const dlBtn = document.getElementById(type + '-download-btn');
+  if (dlBtn) {
+    dlBtn.onclick = () => {
+      const pdf = generatePDF(titles[type], generatedContent[type], type);
+      pdf.save('SmartCV_' + titles[type].replace(/\s+/g,'_') + '.pdf');
+    };
+  }
+}
+
+// ─── PDF generation with template support ────────────────────────
+function generatePDF(title, content, type) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 18;
+  const maxW = pageW - margin * 2;
+  const tpl = (type === 'cv') ? selectedTemplate['cv'] : 'modern';
+
+  // Sanitize both title and content for jsPDF
+  const safeTitle = sanitizeForPDF(title);
+  const safeContent = sanitizeForPDF(content);
+
+  if (tpl === 'bold') {
+    doc.setFillColor(12, 26, 46);
+    doc.rect(0, 0, pageW, 42, 'F');
+    doc.setTextColor(14, 165, 233);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+    doc.text('SMARTCV.NG', margin, 12);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.text(safeTitle, margin, 28);
+    doc.setFontSize(8); doc.setTextColor(150,180,210);
+    doc.text(safeContent.split('\n')[0] || '', margin, 38);
+  } else if (tpl === 'modern') {
+    doc.setFillColor(14, 165, 233);
+    doc.rect(0, 0, 8, 297, 'F');
+    doc.setFillColor(240, 249, 255);
+    doc.rect(8, 0, pageW - 8, 28, 'F');
+    doc.setTextColor(2, 132, 199);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+    doc.text('SMARTCV.NG', margin + 2, 11);
+    doc.setTextColor(12, 26, 46);
+    doc.setFontSize(18);
+    doc.text(safeTitle, margin + 2, 23);
+    doc.setDrawColor(14, 165, 233); doc.setLineWidth(0.4);
+    doc.line(margin + 2, 27, pageW - margin, 27);
+  } else {
+    doc.setFillColor(14, 165, 233);
+    doc.rect(0, 0, pageW, 5, 'F');
+    doc.setTextColor(100, 116, 139);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    doc.text('SmartCV -- smartcv.ng', margin, 13);
+    doc.setTextColor(12, 26, 46);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text(safeTitle, margin, 25);
+    doc.setDrawColor(14, 165, 233); doc.setLineWidth(0.5);
+    doc.line(margin, 29, pageW - margin, 29);
+  }
+
+  const startY = (tpl === 'bold') ? 50 : 36;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(30, 41, 59);
+  const contentMaxW = (tpl === 'modern') ? maxW - 4 : maxW;
+  const contentMargin = (tpl === 'modern') ? margin + 2 : margin;
+  const lines = doc.splitTextToSize(safeContent, contentMaxW);
+  let y = startY;
+  lines.forEach(line => {
+    if (y > 275) {
+      doc.addPage();
+      if (tpl === 'modern') { doc.setFillColor(14,165,233); doc.rect(0,0,8,297,'F'); }
+      y = 20;
+    }
+    const trimmed = line.trim();
+    const isHeader = /^[A-Z][A-Z\s\&\/\-]{3,}$/.test(trimmed);
+    const isDash = /^-{3,}/.test(trimmed);
+    if (isHeader && trimmed.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(tpl === 'bold' ? 56 : 2, tpl === 'bold' ? 189 : 132, tpl === 'bold' ? 248 : 199);
+    } else if (isDash) {
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(200, 220, 240);
+    } else {
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 41, 59);
+    }
+    doc.text(line, contentMargin, y);
+    y += 5.2;
+  });
+
+  doc.setFontSize(8); doc.setTextColor(100, 116, 139);
+  doc.text('Generated by SmartCV -- smartcv.ng', margin, 287);
+  return doc;
+}
+
+// Scroll-fade cards
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.style.opacity = 1; });
+}, { threshold: 0.1 });
+document.querySelectorAll('.service-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transition = 'opacity .5s ease, transform .25s, box-shadow .25s';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
