@@ -162,12 +162,12 @@ footer a{color:var(--sky-light);text-decoration:none}
 .preview-step{padding:4px 0}
 .preview-step h3{font-family:'Sora',sans-serif;font-weight:800;font-size:1.2rem;color:var(--navy);margin-bottom:4px}
 .preview-step .preview-note{font-size:.82rem;color:var(--gray);margin-bottom:16px}
-.preview-wrap{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid #e2eaf3;max-height:360px}
-.preview-content{background:#fff;padding:24px;font-size:.82rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:hidden;filter:blur(4px);user-select:none;-webkit-user-select:none}
-.preview-watermark{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;pointer-events:none}
-.wm-text{font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem;color:rgba(14,165,233,.55);transform:rotate(-30deg);letter-spacing:.08em;white-space:nowrap;text-shadow:0 0 20px rgba(14,165,233,.2)}
-.wm-repeat{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:absolute;inset:0;padding:20px;pointer-events:none}
-.wm-repeat span{font-family:'Sora',sans-serif;font-weight:700;font-size:.72rem;color:rgba(14,165,233,.35);transform:rotate(-25deg);display:block;white-space:nowrap}
+.preview-wrap{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid #e2eaf3;max-height:380px}
+/* Top portion: clear so user sees real content */
+.preview-content{background:#fff;padding:24px;font-size:.82rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:380px;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-mask-image:linear-gradient(to bottom,black 0%,black 38%,transparent 68%);mask-image:linear-gradient(to bottom,black 0%,black 38%,transparent 68%)}
+/* Single diagonal watermark across the blurred area */
+.preview-watermark{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;top:35%}
+.wm-text{font-family:'Sora',sans-serif;font-weight:800;font-size:1.3rem;color:rgba(14,165,233,0.45);transform:rotate(-30deg);letter-spacing:.12em;white-space:nowrap;text-shadow:none}
 .preview-cta{margin-top:18px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));border-radius:14px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .preview-cta .cta-text h4{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:3px}
 .preview-cta .cta-text p{font-size:.8rem;color:rgba(255,255,255,.8)}
@@ -457,14 +457,7 @@ footer a{color:var(--sky-light);text-decoration:none}
         <p class="preview-note">Your CV has been created. Pay ₦5,000 to unlock and download the full clean PDF.</p>
         <div class="preview-wrap">
           <div class="preview-content" id="cv-preview-content"></div>
-          <div class="preview-watermark">
-            <div class="wm-repeat">
-              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-              <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            </div>
-          </div>
+          <div class="preview-watermark"><span class="wm-text">SmartCV &mdash; Unpaid Preview</span></div>
         </div>
         <div class="preview-cta">
           <div class="cta-text">
@@ -500,7 +493,12 @@ footer a{color:var(--sky-light);text-decoration:none}
       <p class="modal-subtitle">Tell us about the job and yourself — preview your letter then pay to download.</p>
       <div class="form-group"><label>Your Full Name *</label><input id="cl-name" type="text" placeholder="e.g. Adaeze Nwosu"></div>
       <div class="form-group"><label>Email Address *</label><input id="cl-email" type="email" placeholder="yourname@gmail.com"></div>
-      <div class="form-group"><label>Job Title You're Applying For *</label><input id="cl-jobtitle" type="text" placeholder="e.g. Software Engineer at Flutterwave"></div>
+      <div class="form-group"><label>Your Phone Number</label><input id="cl-phone" type="tel" placeholder="e.g. 08012345678"></div>
+      <div class="form-group"><label>Your Address (optional)</label><input id="cl-address" type="text" placeholder="e.g. 12 Adeola Odeku Street, Victoria Island, Lagos"></div>
+      <div class="form-group"><label>Company Name *</label><input id="cl-company" type="text" placeholder="e.g. Flutterwave Technologies Ltd"></div>
+      <div class="form-group"><label>Company Address (optional)</label><input id="cl-company-address" type="text" placeholder="e.g. 162 Ligali Ayorinde Street, Victoria Island, Lagos"></div>
+      <div class="form-group"><label>Hiring Manager Name (optional)</label><input id="cl-manager" type="text" placeholder="e.g. Mr. Adebayo or The Hiring Manager"></div>
+      <div class="form-group"><label>Job Title You're Applying For *</label><input id="cl-jobtitle" type="text" placeholder="e.g. Software Engineer"></div>
       <div class="form-group"><label>Paste the Job Description *</label><textarea id="cl-jd" placeholder="Copy and paste the job description from the job posting here..."></textarea></div>
       <div class="form-group"><label>Your Key Qualifications & Experience</label><textarea id="cl-qual" placeholder="e.g. 3 years in fintech, B.Sc Software Engineering, strong React and Node.js skills..."></textarea></div>
       <div class="form-group"><label>Why do you want this job? (optional)</label><input id="cl-why" type="text" placeholder="e.g. Passionate about fintech, admire the company's mission..."></div>
@@ -526,12 +524,7 @@ footer a{color:var(--sky-light);text-decoration:none}
         <p class="preview-note">Your cover letter has been written. Pay ₦5,000 to unlock and download the full clean PDF.</p>
         <div class="preview-wrap">
           <div class="preview-content" id="cover-preview-content"></div>
-          <div class="preview-watermark"><div class="wm-repeat">
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-          </div></div>
+          <div class="preview-watermark"><span class="wm-text">SmartCV &mdash; Unpaid Preview</span></div>
         </div>
         <div class="preview-cta">
           <div class="cta-text"><h4>🔓 Unlock Full Letter — ₦5,000</h4><p>Pay once, download instantly. No subscription.</p></div>
@@ -590,12 +583,7 @@ footer a{color:var(--sky-light);text-decoration:none}
         <p class="preview-note">Your prep guide has been created. Pay ₦5,000 to unlock and download the full clean PDF.</p>
         <div class="preview-wrap">
           <div class="preview-content" id="interview-preview-content"></div>
-          <div class="preview-watermark"><div class="wm-repeat">
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-          </div></div>
+          <div class="preview-watermark"><span class="wm-text">SmartCV &mdash; Unpaid Preview</span></div>
         </div>
         <div class="preview-cta">
           <div class="cta-text"><h4>🔓 Unlock Full Guide — ₦5,000</h4><p>Pay once, download instantly. No subscription.</p></div>
@@ -653,12 +641,7 @@ footer a{color:var(--sky-light);text-decoration:none}
         <p class="preview-note">Your optimized profile content is ready. Pay ₦5,000 to unlock and download the full clean PDF.</p>
         <div class="preview-wrap">
           <div class="preview-content" id="linkedin-preview-content"></div>
-          <div class="preview-watermark"><div class="wm-repeat">
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-            <span>SmartCV — Unpaid Preview</span><span>SmartCV — Unpaid Preview</span>
-          </div></div>
+          <div class="preview-watermark"><span class="wm-text">SmartCV &mdash; Unpaid Preview</span></div>
         </div>
         <div class="preview-cta">
           <div class="cta-text"><h4>🔓 Unlock Full Profile Guide — ₦5,000</h4><p>Pay once, download instantly. No subscription.</p></div>
@@ -819,15 +802,39 @@ Write the complete CV now. Make it professional, concise and impactful. Minimum 
     const email = document.getElementById('cl-email')?.value.trim() || '';
     const job = document.getElementById('cl-jobtitle')?.value.trim() || '';
     if (!name || !email || !job) return null;
-    return `You are a professional cover letter writer. Write a compelling, personalized cover letter. Professional tone. Include greeting, 3 strong paragraphs, professional sign-off. Plain text only.
+    const phone = document.getElementById('cl-phone')?.value.trim() || '';
+    const address = document.getElementById('cl-address')?.value.trim() || '';
+    const company = document.getElementById('cl-company')?.value.trim() || '';
+    const companyAddress = document.getElementById('cl-company-address')?.value.trim() || '';
+    const manager = document.getElementById('cl-manager')?.value.trim() || 'The Hiring Manager';
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    return `You are a professional cover letter writer. Write a formal, compelling cover letter formatted exactly as follows — plain text only, no markdown:
 
-Applicant: ${name} (${email})
-Job: ${job}
-Job Description: ${document.getElementById('cl-jd')?.value.trim() || 'Not provided'}
-Qualifications: ${document.getElementById('cl-qual')?.value.trim() || 'Not provided'}
-Why this job: ${document.getElementById('cl-why')?.value.trim() || 'Not provided'}
+Sender block (top right):
+${name}
+${address || ''}
+${phone || ''}
+${email}
 
-Write the full cover letter now. 300–400 words.`;
+Date: ${today}
+
+Recipient block:
+${manager}
+${company || ''}
+${companyAddress || ''}
+
+Subject line: Application for the Position of ${job}
+
+Then write the body: Dear ${manager}, followed by 3 strong professional paragraphs (why interested, what they bring, closing call to action), then Yours sincerely, ${name}.
+
+Applicant details:
+- Name: ${name}
+- Job applying for: ${job} at ${company || 'the company'}
+- Job Description: ${document.getElementById('cl-jd')?.value.trim() || 'Not provided'}
+- Qualifications & Experience: ${document.getElementById('cl-qual')?.value.trim() || 'Not provided'}
+- Why this job: ${document.getElementById('cl-why')?.value.trim() || 'Not provided'}
+
+Write the full professional cover letter now. 300-400 words. No horizontal lines or decorators.`;
   }
   if (type === 'interview') {
     const name = document.getElementById('ip-name')?.value.trim() || '';
@@ -991,14 +998,22 @@ function paystackCheckout(type) {
 }
 
 // ─── STEP 3: After payment — show download ────────────────────────
+function getUserName(type) {
+  const ids = { cv: 'cv-name', cover: 'cl-name', interview: 'ip-name', linkedin: 'li-name' };
+  const val = document.getElementById(ids[type])?.value.trim() || 'Document';
+  return val.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+}
+
 function onPaymentSuccess(type, reference) {
   showStep(type, 'success');
-  const titles = { cv: 'Professional CV', cover: 'Cover Letter', interview: 'Interview Prep Guide', linkedin: 'LinkedIn Profile Optimizer' };
+  const serviceLabels = { cv: 'CV', cover: 'Cover_Letter', interview: 'Interview_Guide', linkedin: 'LinkedIn_Optimizer' };
+  const pdfTitles = { cv: 'Professional CV', cover: 'Cover Letter', interview: 'Interview Prep Guide', linkedin: 'LinkedIn Profile Optimizer' };
   const dlBtn = document.getElementById(type + '-download-btn');
   if (dlBtn) {
     dlBtn.onclick = () => {
-      const pdf = generatePDF(titles[type], generatedContent[type], type);
-      pdf.save(titles[type].replace(/\s+/g,'_') + '.pdf');
+      const pdf = generatePDF(pdfTitles[type], generatedContent[type], type);
+      const userName = getUserName(type);
+      pdf.save(userName + '_' + serviceLabels[type] + '.pdf');
     };
   }
 }
@@ -1032,10 +1047,50 @@ function generatePDF(title, content, type) {
     }
   }
 
+  if (type === 'cover') return buildCoverLetter(safe);
   if (tpl === 'classic') return buildClassic(parsed, candidateName, type);
   if (tpl === 'modern')  return buildModern(parsed, candidateName, type);
   if (tpl === 'bold')    return buildBold(parsed, candidateName, type);
   return buildClassic(parsed, candidateName, type);
+}
+
+// ── COVER LETTER PDF — address block format, no lines ─────────────
+function buildCoverLetter(safeContent) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, lm = 24, rm = 24, cw = pageW - lm - rm;
+  let y = 24;
+
+  const lines = safeContent.split('\n');
+  lines.forEach(raw => {
+    const line = raw.trimEnd();
+    y = checkY(doc, y, 6, 'classic');
+
+    if (!line.trim()) { y += 4; return; }
+
+    // Subject line — bold
+    if (/^(Subject|RE|Re|Application for)/i.test(line.trim())) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      const wl = doc.splitTextToSize(line, cw);
+      wl.forEach(l => { doc.text(l, lm, y); y += 6; });
+      y += 2; return;
+    }
+
+    // Greeting / closing — bold
+    if (/^(Dear |Yours |Kind regards|Sincerely|Regards)/i.test(line.trim())) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(line, lm, y); y += 6; return;
+    }
+
+    // Normal body
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+    doc.setTextColor(30, 41, 59);
+    const wrapped = doc.splitTextToSize(line, cw);
+    wrapped.forEach(wl => { y = checkY(doc, y, 6, 'classic'); doc.text(wl, lm, y); y += 6; });
+  });
+  return doc;
 }
 
 // ── Shared page helpers ───────────────────────────────────────────
@@ -1055,76 +1110,54 @@ function checkY(doc, y, needed, tpl) {
   return y;
 }
 
-// ── TEMPLATE 1: CLASSIC ───────────────────────────────────────────
-// Clean white, name centred at top, thin rule, sections in dark caps
+// ── TEMPLATE 1: CLASSIC ─────────────────────────────────────────
 function buildClassic(parsed, candidateName, type) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageW = 210, lm = 20, rm = 20, cw = pageW - lm - rm;
   let y = 22;
 
-  // ── Header: candidate name centred, large ──
   if (candidateName) {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
+    doc.setFontSize(24);
     doc.setTextColor(15, 23, 42);
     doc.text(candidateName, pageW / 2, y, { align: 'center' });
-    y += 8;
-    // thin decorative rule under name
-    doc.setDrawColor(100, 116, 139);
-    doc.setLineWidth(0.3);
-    doc.line(lm, y, pageW - rm, y);
-    y += 8;
+    y += 12;
   }
 
-  // ── Body ──
   let skipFirst = !!candidateName;
   parsed.forEach(item => {
     if (item.type === 'blank') { y += 3; return; }
-    if (item.type === 'rule')  { return; } // suppress raw dashes
-
+    if (item.type === 'rule') { return; }
     if (item.type === 'heading') {
       y = checkY(doc, y, 12, 'classic');
-      y += 4;
-      // Section heading: bold, dark, uppercase, with full-width rule below
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(30, 64, 175); // blue accent
-      doc.text(item.text, lm, y);
-      y += 2;
-      doc.setDrawColor(30, 64, 175);
-      doc.setLineWidth(0.4);
-      doc.line(lm, y, pageW - rm, y);
       y += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(30, 64, 175);
+      doc.text(item.text, lm, y);
+      y += 6;
       skipFirst = false;
       return;
     }
-
     if (item.type === 'body') {
-      // skip the first body line if it's the name (already in header)
       if (skipFirst) { skipFirst = false; return; }
       y = checkY(doc, y, 6, 'classic');
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(30, 41, 59);
       const wrapped = doc.splitTextToSize(item.text, cw);
       wrapped.forEach(wl => {
         y = checkY(doc, y, 5.5, 'classic');
-        // Sub-headings inside sections (e.g. job title lines) — bold if short
-        const isSub = wl.trim().length < 60 && /^[A-Z]/.test(wl.trim()) && !wl.trim().startsWith('-');
-        if (isSub && wl.trim().split(' ').length <= 8) {
-          doc.setFont('helvetica', 'bold'); doc.setTextColor(15, 23, 42);
+        const isSub = wl.trim().length < 60 && /^[A-Z]/.test(wl.trim()) && wl.trim().split(' ').length <= 8;
+        if (isSub) {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(15, 23, 42);
         } else if (wl.trim().startsWith('-') || wl.trim().startsWith('*')) {
-          doc.setFont('helvetica', 'normal'); doc.setTextColor(51, 65, 85);
-          doc.text('•', lm + 2, y);
-          const bulletLines = doc.splitTextToSize(wl.replace(/^[-*]\s*/, ''), cw - 6);
-          bulletLines.forEach((bl, bi) => { doc.text(bl, lm + 7, y + bi * 5.2); });
-          y += bulletLines.length * 5.2; return;
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(51, 65, 85);
+          const bl = doc.splitTextToSize(wl.replace(/^[-*]\s*/, ''), cw - 6);
+          bl.forEach((b, bi) => { doc.text('•', lm + 2, y + bi * 5.2); doc.text(b, lm + 7, y + bi * 5.2); });
+          y += bl.length * 5.2; return;
         } else {
-          doc.setFont('helvetica', 'normal'); doc.setTextColor(51, 65, 85);
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(51, 65, 85);
         }
-        doc.text(wl, lm, y);
-        y += 5.5;
+        doc.text(wl, lm, y); y += 5.5;
       });
     }
   });
@@ -1146,16 +1179,15 @@ function buildModern(parsed, candidateName, type) {
   doc.setFillColor(56, 189, 248);
   doc.rect(0, 0, 4, 297, 'F');
 
-  // Candidate name in sidebar
+  // Candidate name in sidebar — bold, large, no line
   let sy = 22;
   if (candidateName) {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
+    doc.setFontSize(15);
     doc.setTextColor(255, 255, 255);
     const nameLines = doc.splitTextToSize(candidateName, sideW - 14);
-    nameLines.forEach(nl => { doc.text(nl, 10, sy); sy += 7; });
-    doc.setDrawColor(56, 189, 248); doc.setLineWidth(0.5);
-    doc.line(10, sy, sideW - 6, sy); sy += 6;
+    nameLines.forEach(nl => { doc.text(nl, 10, sy); sy += 8; });
+    sy += 4;
   }
 
   // Parse sidebar content (CONTACT + SKILLS sections go to sidebar)
@@ -1179,12 +1211,10 @@ function buildModern(parsed, candidateName, type) {
   sideItems.forEach(item => {
     if (item.type === 'blank') { sy += 2; return; }
     if (item.type === 'heading') {
-      sy += 4;
+      sy += 5;
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
       doc.setTextColor(56, 189, 248);
-      doc.text(item.text, 10, sy); sy += 3;
-      doc.setDrawColor(56, 189, 248); doc.setLineWidth(0.2);
-      doc.line(10, sy, sideW - 6, sy); sy += 4;
+      doc.text(item.text, 10, sy); sy += 6;
       return;
     }
     if (item.type === 'body') {
@@ -1205,14 +1235,11 @@ function buildModern(parsed, candidateName, type) {
     if (item.type === 'rule') return;
     if (item.type === 'heading') {
       my = checkY(doc, my, 12, 'modern');
-      my += 4;
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+      my += 5;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
       doc.setTextColor(31, 41, 70);
       doc.text(item.text, mainX, my);
-      my += 2;
-      doc.setDrawColor(56, 189, 248); doc.setLineWidth(0.4);
-      doc.line(mainX, my, pageW - 14, my);
-      my += 5; return;
+      my += 6; return;
     }
     if (item.type === 'body') {
       my = checkY(doc, my, 6, 'modern');
@@ -1277,11 +1304,9 @@ function buildBold(parsed, candidateName, type) {
     if (item.type === 'heading') {
       y = checkY(doc, y, 12, 'bold');
       y += 5;
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
-      doc.setTextColor(15, 23, 42);
-      doc.text(item.text, lm, y); y += 2;
-      doc.setDrawColor(56, 189, 248); doc.setLineWidth(0.5);
-      doc.line(lm, y, pageW - rm, y); y += 5;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+      doc.setTextColor(56, 189, 248);
+      doc.text(item.text, lm, y); y += 7;
       skipCount = 0; return;
     }
 
