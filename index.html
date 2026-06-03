@@ -145,8 +145,9 @@ footer a{color:var(--sky-light);text-decoration:none}
 .pay-bar{margin-top:28px;background:linear-gradient(135deg,var(--sky-ultra),var(--sky-pale));border:1.5px solid var(--sky-light);border-radius:14px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .pay-bar .amount{font-family:'Sora',sans-serif;font-weight:800;font-size:1.4rem;color:var(--sky-dark)}
 .pay-bar .amount small{font-size:.78rem;font-weight:400;color:var(--gray);display:block}
-.btn-pay{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:11px;padding:13px 28px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .15s;display:flex;align-items:center;gap:8px}
-.btn-pay:hover{opacity:.88;transform:translateY(-1px)}
+/* PREVIEW BUTTON — standalone below form */
+.btn-pay{width:100%;margin-top:24px;justify-content:center;background:linear-gradient(135deg,var(--sky),var(--sky-dark));color:#fff;border:none;border-radius:12px;padding:15px 28px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .15s;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(14,165,233,.3)}
+.btn-pay:hover{opacity:.9;transform:translateY(-1px)}
 .btn-pay:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .secure-note{font-size:.76rem;color:var(--gray);margin-top:10px;text-align:center}
 
@@ -444,7 +445,6 @@ footer a{color:var(--sky-light);text-decoration:none}
 
       <div id="cv-error" class="error-box" style="display:none"></div>
       <button class="btn-pay" id="cv-pay-btn" onclick="startGenerate('cv')">✨ Preview My CV</button>
-      </div>
     </div>
 
     <!-- STEP: GENERATING -->
@@ -512,8 +512,9 @@ footer a{color:var(--sky-light);text-decoration:none}
       <div class="form-group"><label>Why do you want this job? (optional)</label><input id="cl-why" type="text" placeholder="e.g. Passionate about fintech, admire the company's mission..."></div>
       <div id="cover-error" class="error-box" style="display:none"></div>
       <button class="btn-pay" id="cover-pay-btn" onclick="startGenerate('cover')">✨ Preview My Letter</button>
-      </div>
     </div>
+
+    <!-- STEP: GENERATING -->
     <div id="cover-step-generating" style="display:none">
       <div class="generating">
         <span class="gen-icon">✉️</span>
@@ -568,8 +569,9 @@ footer a{color:var(--sky-light);text-decoration:none}
       <div class="form-group"><label>Your Biggest Worry About the Interview (optional)</label><input id="ip-worry" type="text" placeholder="e.g. salary negotiation, technical questions, group exercises..."></div>
       <div id="interview-error" class="error-box" style="display:none"></div>
       <button class="btn-pay" id="interview-pay-btn" onclick="startGenerate('interview')">✨ Preview My Guide</button>
-      </div>
     </div>
+
+    <!-- STEP: GENERATING -->
     <div id="interview-step-generating" style="display:none">
       <div class="generating">
         <span class="gen-icon">🎯</span>
@@ -623,8 +625,9 @@ footer a{color:var(--sky-light);text-decoration:none}
       <div class="form-group"><label>Type of Opportunities You Want</label><input id="li-opps" type="text" placeholder="e.g. Remote work, Mid-level roles, International companies, FMCG sector"></div>
       <div id="linkedin-error" class="error-box" style="display:none"></div>
       <button class="btn-pay" id="linkedin-pay-btn" onclick="startGenerate('linkedin')">✨ Preview My Profile</button>
-      </div>
     </div>
+
+    <!-- STEP: GENERATING -->
     <div id="linkedin-step-generating" style="display:none">
       <div class="generating">
         <span class="gen-icon">💼</span>
