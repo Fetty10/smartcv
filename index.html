@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SmartCV — Career Services for Nigerians</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='9' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230ea5e9'/%3E%3Cstop offset='1' stop-color='%230284c7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='18' y='25' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' font-size='18' fill='white'%3eSC%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -22,12 +23,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:300;background:rgba(255,255,255,.93);backdrop-filter:blur(14px);border-bottom:1px solid rgba(14,165,233,.12);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px}
-.logo{font-family:'Sora',sans-serif;font-weight:800;font-size:1.35rem;color:var(--navy);display:flex;align-items:center;gap:8px;text-decoration:none}
-.logo span{color:var(--sky)}
-.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));border-radius:9px;display:grid;place-items:center;font-size:1rem}
-.nav-links{display:flex;gap:32px;list-style:none}
-.nav-links a{text-decoration:none;color:var(--gray);font-size:.92rem;font-weight:500;transition:color .2s}
-.nav-links a:hover{color:var(--sky)}
+.logo{font-family:'Sora',sans-serif;font-weight:800;font-size:1.4rem;color:var(--navy);display:flex;align-items:center;gap:10px;text-decoration:none;letter-spacing:-.01em}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));border-radius:10px;display:grid;place-items:center;flex-shrink:0;box-shadow:0 3px 10px rgba(14,165,233,.35)}
+.logo-text{display:flex;align-items:baseline;gap:0}
+.logo-text em{font-style:normal;color:var(--sky);font-weight:900}
+.nav-links{display:none}
 .nav-cta{background:var(--sky);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,transform .15s}
 .nav-cta:hover{background:var(--sky-dark);transform:translateY(-1px)}
 
@@ -151,12 +151,14 @@ footer a{color:var(--sky-light);text-decoration:none}
 .secure-note{font-size:.76rem;color:var(--gray);margin-top:10px;text-align:center}
 
 /* GENERATING */
-.generating{text-align:center;padding:30px 0}
-.gen-icon{font-size:3rem;animation:bounce 1s infinite alternate}
-@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
-.gen-bar{width:100%;height:6px;background:var(--sky-pale);border-radius:50px;margin:20px 0 10px;overflow:hidden}
+.generating{text-align:center;padding:48px 20px}
+.gen-icon{font-size:3.5rem;animation:bounce 1s infinite alternate;display:block;margin-bottom:4px}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-12px)}}
+.generating h3{font-family:'Sora',sans-serif;font-weight:800;font-size:1.3rem;color:var(--navy);margin:14px 0 8px}
+.generating > p{color:var(--gray);font-size:.9rem;margin-bottom:4px}
+.gen-bar{width:100%;height:7px;background:var(--sky-pale);border-radius:50px;margin:22px 0 10px;overflow:hidden}
 .gen-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--sky-light));border-radius:50px;width:0;transition:width 3s ease}
-.gen-text{font-size:.88rem;color:var(--gray)}
+.gen-text{font-size:.85rem;color:var(--sky-dark);font-weight:500}
 
 /* PREVIEW STEP */
 .preview-step{padding:4px 0}
@@ -202,12 +204,21 @@ footer a{color:var(--sky-light);text-decoration:none}
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="logo"><div class="logo-icon">🚀</div>Smart<span>CV</span></a>
-  <ul class="nav-links">
-    <li><a href="#services">Services</a></li>
-    <li><a href="#faq">FAQ</a></li>
-  </ul>
-  <button class="nav-cta" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Get Started</button>
+  <a href="#" class="logo">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="2" width="10" height="13" rx="1.5" fill="white" fill-opacity="0.25"/>
+        <rect x="3" y="2" width="10" height="13" rx="1.5" stroke="white" stroke-width="1.3"/>
+        <line x1="5.5" y1="6" x2="10.5" y2="6" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="5.5" y1="8.5" x2="10.5" y2="8.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="5.5" y1="11" x2="8.5" y2="11" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="14.5" cy="14.5" r="3.5" fill="#10b981"/>
+        <path d="M13 14.5l1 1 2-2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="logo-text">Smart<em>CV</em></span>
+  </a>
+  <button class="nav-cta" onclick="openModal('cv')">Get Started</button>
 </nav>
 
 <!-- SERVICES -->
@@ -373,7 +384,11 @@ footer a{color:var(--sky-light);text-decoration:none}
         </div>
 
         <div class="form-group"><label>Key Skills</label><input id="cv-skills" type="text" placeholder="e.g. Python, Excel, Project Management, Leadership"></div>
-      </div>
+
+        <div class="form-group">
+          <label>Anything else to include? <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+          <textarea id="cv-extra" placeholder="e.g. Certifications, awards, volunteer work, languages spoken, hobbies, or any other information you'd like in your CV..." style="min-height:80px"></textarea>
+        </div>      </div>
 
       <!-- UPLOAD TAB -->
       <div id="cv-upload" class="tab-panel">
@@ -433,26 +448,15 @@ footer a{color:var(--sky-light);text-decoration:none}
     </div>
 
     <!-- STEP: GENERATING -->
-        <div id="cv-step-generating" style="display: none">
-          <div class="generating">
-            <div class="gen-icon">📄</div>
-            <h3
-              style="
-                font-family: 'Sora', sans-serif;
-                font-weight: 800;
-                color: var(--navy);
-                margin: 12px 0 6px;
-              "
-            >
-              Building Your CV...
-            </h3>
-            <p style="color: var(--gray); font-size: 0.88rem">
-              Crafting your professional CV. Please wait a moment.
-            </p>
-            <div class="gen-bar"><div class="gen-fill" id="cv-bar"></div></div>
-            <p class="gen-text" id="cv-gen-text">Analysing your details...</p>
-          </div>
-        </div>
+    <div id="cv-step-generating" style="display:none">
+      <div class="generating">
+        <span class="gen-icon">📄</span>
+        <h3>Building Your CV...</h3>
+        <p>Crafting your professional CV. Please wait a moment.</p>
+        <div class="gen-bar"><div class="gen-fill" id="cv-bar"></div></div>
+        <p class="gen-text" id="cv-gen-text">Analysing your details...</p>
+      </div>
+    </div>
 
     <!-- STEP: PREVIEW -->
     <div id="cv-step-preview" style="display:none">
@@ -512,9 +516,9 @@ footer a{color:var(--sky-light);text-decoration:none}
     </div>
     <div id="cover-step-generating" style="display:none">
       <div class="generating">
-        <div class="gen-icon">✉️</div>
-        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Writing Your Cover Letter...</h3>
-        <p style="color:var(--gray);font-size:.88rem">Crafting a personalized letter tailored to the job.</p>
+        <span class="gen-icon">✉️</span>
+        <h3>Writing Your Cover Letter...</h3>
+        <p>Crafting a personalized letter tailored to the job.</p>
         <div class="gen-bar"><div class="gen-fill" id="cover-bar"></div></div>
         <p class="gen-text">Matching your strengths to the job requirements...</p>
       </div>
@@ -568,9 +572,9 @@ footer a{color:var(--sky-light);text-decoration:none}
     </div>
     <div id="interview-step-generating" style="display:none">
       <div class="generating">
-        <div class="gen-icon">🎯</div>
-        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Building Your Prep Guide...</h3>
-        <p style="color:var(--gray);font-size:.88rem">Preparing your personalised interview questions and answers.</p>
+        <span class="gen-icon">🎯</span>
+        <h3>Building Your Prep Guide...</h3>
+        <p>Preparing your personalised interview questions and answers.</p>
         <div class="gen-bar"><div class="gen-fill" id="interview-bar"></div></div>
         <p class="gen-text">Generating role-specific questions and model answers...</p>
       </div>
@@ -623,9 +627,9 @@ footer a{color:var(--sky-light);text-decoration:none}
     </div>
     <div id="linkedin-step-generating" style="display:none">
       <div class="generating">
-        <div class="gen-icon">💼</div>
-        <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--navy);margin:12px 0 6px">Optimizing Your Profile...</h3>
-        <p style="color:var(--gray);font-size:.88rem">Crafting recruiter-friendly LinkedIn content for you.</p>
+        <span class="gen-icon">💼</span>
+        <h3>Optimizing Your Profile...</h3>
+        <p>Crafting recruiter-friendly LinkedIn content for you.</p>
         <div class="gen-bar"><div class="gen-fill" id="linkedin-bar"></div></div>
         <p class="gen-text">Writing your headline, summary and experience sections...</p>
       </div>
@@ -779,18 +783,32 @@ function buildPrompt(type) {
     const email = document.getElementById('cv-email')?.value.trim() || '';
     const industry = document.getElementById('cv-industry')?.value.trim() || '';
     if (!name || !email || !industry) return null;
-    return `You are a professional CV writer. Create a complete, polished, professional CV. Use section headers in ALL CAPS followed by dashes (------). Plain text only — no markdown symbols.
+    const extra = document.getElementById('cv-extra')?.value.trim() || '';
+    return `You are a professional CV writer. Create a complete, polished CV following these rules STRICTLY:
 
+FORMATTING RULES:
+1. The very first line must be the candidate's full name ONLY — no phone, no email, nothing else on that line.
+2. Leave one blank line after the name.
+3. Then write the sections in this order: CONTACT INFORMATION, PROFESSIONAL SUMMARY, WORK EXPERIENCE, EDUCATION, SKILLS.
+4. Section headers must be in ALL CAPS.
+5. Under CONTACT INFORMATION, list email and phone number — NOT at the top with the name.
+6. Plain text only — no markdown, no asterisks, no hashtags, no dashes as separators.
+7. Minimum 400 words.
+
+Candidate details:
 Name: ${name}
 Phone: ${document.getElementById('cv-phone')?.value.trim() || ''}
 Email: ${email}
 Industry: ${industry}
 Experience Level: ${document.getElementById('cv-exp')?.value || ''}
-Education:\n${collectEdu() || 'Not provided'}
-Work Experience:\n${collectExp() || 'Not provided'}
+Education:
+${collectEdu() || 'Not provided'}
+Work Experience:
+${collectExp() || 'Not provided'}
 Key Skills: ${document.getElementById('cv-skills')?.value.trim() || ''}
+${extra ? `\nAdditional information to include in the CV:\n${extra}` : ''}
 
-Write the complete CV now. Make it professional, concise and impactful. Minimum 400 words.`;
+Write the complete CV now. Start with the name on the first line and nothing else.`;
   }
   if (type === 'cover') {
     const name = document.getElementById('cl-name')?.value.trim() || '';
