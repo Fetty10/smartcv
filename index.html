@@ -1044,12 +1044,12 @@ function generatePDF(title, content, type) {
 
   if (type === 'cover') return buildCoverLetter(safe);
 
-  // Use new structured parser
-  const parsed = parseCVContent(safe, '');
+  const parsed = parseCVContent(safe);
 
-  // Extract candidate name — very first non-empty body line
+  // Extract candidate name — very first non-empty body line (before first heading)
   let candidateName = '';
   for (const tk of parsed) {
+    if (tk.kind === 'heading') break; // stop before first heading
     if (tk.kind === 'body' && tk.text.trim().length > 1) {
       candidateName = tk.text.trim();
       break;
@@ -1128,7 +1128,25 @@ function drawRule(doc, lm, rm, y, pageW) {
 // ─────────────────────────────────────────────────────────────────
 // PARSER: turns raw Claude text into structured tokens
 // ─────────────────────────────────────────────────────────────────
-function parseCVContent(safe, candidateName) {
+const KNOWN_SECTIONS = [
+  'CONTACT INFORMATION','CONTACT','PERSONAL INFORMATION','PERSONAL DETAILS',
+  'PROFESSIONAL SUMMARY','SUMMARY','OBJECTIVE','PROFILE','CAREER OBJECTIVE',
+  'WORK EXPERIENCE','EXPERIENCE','EMPLOYMENT HISTORY','EMPLOYMENT','CAREER HISTORY',
+  'EDUCATION','ACADEMIC BACKGROUND','QUALIFICATIONS','ACADEMIC QUALIFICATIONS',
+  'SKILLS','KEY SKILLS','CORE SKILLS','TECHNICAL SKILLS','COMPETENCIES',
+  'CERTIFICATIONS','CERTIFICATES','PROFESSIONAL CERTIFICATIONS','LICENSES',
+  'ACHIEVEMENTS','AWARDS','HONOURS','HONORS',
+  'LANGUAGES','INTERESTS','HOBBIES','VOLUNTEER','VOLUNTEERING','REFERENCES',
+  'PUBLICATIONS','PROJECTS','PROFESSIONAL DEVELOPMENT','TRAINING',
+  // Title-case variants
+  'Professional Summary','Work Experience','Education','Skills','Key Skills',
+  'Contact Information','Employment History','Certifications','Achievements',
+  'Languages','Interests','References','Volunteer Experience','Technical Skills',
+  'Core Competencies','Career Objective','Personal Profile','Professional Profile',
+  'Summary','Objective','Experience','Qualifications','Awards','Projects','Training'
+];
+
+function parseCVContent(safe) {
   const rawLines = safe.split('\n');
   const tokens = [];
 
@@ -1138,15 +1156,16 @@ function parseCVContent(safe, candidateName) {
 
     if (!t) { tokens.push({ kind: 'blank' }); return; }
 
-    // Pure section heading: all caps, 3-50 chars, no lowercase letters, not a sentence
-    // Must be at least 3 chars and contain only uppercase, spaces, slashes, ampersands, dashes
-    const isHeading = /^[A-Z][A-Z\s\/&\-\.]{2,49}$/.test(t) &&
-                      !/[a-z]/.test(t) &&
-                      !t.includes('.') &&
-                      t.split(' ').every(w => w.length > 0) &&
-                      t.length >= 4 && t.length <= 50;
+    // Check against known section names (case-insensitive)
+    const upperT = t.toUpperCase();
+    const isKnownSection = KNOWN_SECTIONS.some(s => s.toUpperCase() === upperT);
 
-    if (isHeading) { tokens.push({ kind: 'heading', text: t }); return; }
+    // Also detect pure ALL CAPS lines (no lowercase)
+    const isAllCaps = /^[A-Z][A-Z\s\/&\-]{2,49}$/.test(t) && !/[a-z]/.test(t) && !t.includes('.') && t.length <= 50;
+
+    if (isKnownSection || isAllCaps) {
+      tokens.push({ kind: 'heading', text: t.toUpperCase() }); return;
+    }
 
     // Raw dash/line separator — ignored
     if (/^[-=_]{3,}$/.test(t)) { tokens.push({ kind: 'rule' }); return; }
