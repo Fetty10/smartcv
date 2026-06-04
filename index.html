@@ -903,25 +903,28 @@ function sanitizeForPDF(text) {
     });
 }
 
-// ─── API call — works locally (direct) and on Vercel (proxy) ─────
+// ─── API call ──────────────────────────────────────────────────────
 async function callGenerate(prompt) {
-  // Try Vercel edge function first (production)
-  try {
+  // On Vercel (hostname is not localhost/file), always use the edge function
+  const isDeployed = location.hostname !== 'localhost' && location.protocol !== 'file:';
+
+  if (isDeployed) {
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt }),
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.result) return data.result;
-    }
-  } catch (_) { /* fall through to direct call */ }
+    let data;
+    try { data = await res.json(); } catch(e) { throw new Error('Server error — please try again.'); }
+    if (!res.ok) throw new Error(data?.error || 'Generation failed. Please try again.');
+    if (!data.result) throw new Error('Empty response from server. Please try again.');
+    return data.result;
+  }
 
-  // Fallback: call Anthropic API directly (for local testing)
+  // Local testing only — direct Anthropic call
   const ANTHROPIC_KEY = window.__SMARTCV_KEY__ || '';
   if (!ANTHROPIC_KEY) {
-    throw new Error('Not deployed yet. Please set your API key for local testing: open browser console and run: window.__SMARTCV_KEY__ = "sk-ant-..."');
+    throw new Error('For local testing: open browser console and run: window.__SMARTCV_KEY__ = "sk-ant-..."');
   }
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -933,7 +936,7 @@ async function callGenerate(prompt) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 2048,
+      max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -1135,17 +1138,27 @@ function parseCVContent(safe, candidateName) {
 
     if (!t) { tokens.push({ kind: 'blank' }); return; }
 
-    // Pure section heading: all caps, 3-40 chars, not a full sentence
-    if (/^[A-Z][A-Z\s\/&\-]{2,39}$/.test(t) && !t.includes('.') && t.length <= 42) {
-      tokens.push({ kind: 'heading', text: t }); return;
+    // Pure section heading: all caps, 3-50 chars, no lowercase letters, not a sentence
+    // Must be at least 3 chars and contain only uppercase, spaces, slashes, ampersands, dashes
+    const isHeading = /^[A-Z][A-Z\s\/&\-\.]{2,49}$/.test(t) &&
+                      !/[a-z]/.test(t) &&
+                      !t.includes('.') &&
+                      t.split(' ').every(w => w.length > 0) &&
+                      t.length >= 4 && t.length <= 50;
+
+    if (isHeading) { tokens.push({ kind: 'heading', text: t }); return; }
+
+    // Raw dash/line separator — ignored
+    if (/^[-=_]{3,}$/.test(t)) { tokens.push({ kind: 'rule' }); return; }
+
+    // Bullet line — starts with -, *, or •
+    if (/^[-*\u2022]\s+/.test(t)) {
+      tokens.push({ kind: 'bullet', text: t.replace(/^[-*\u2022]\s*/, '') }); return;
     }
 
-    // Raw dash separator line — ignored
-    if (/^[-–—]{3,}$/.test(t)) { tokens.push({ kind: 'rule' }); return; }
-
-    // Bullet line
-    if (/^[-*•]\s/.test(t)) {
-      tokens.push({ kind: 'bullet', text: t.replace(/^[-*•]\s*/, '') }); return;
+    // Numbered bullet — e.g. "1. Something"
+    if (/^\d+\.\s+/.test(t)) {
+      tokens.push({ kind: 'bullet', text: t.replace(/^\d+\.\s*/, '') }); return;
     }
 
     tokens.push({ kind: 'body', text: line });
