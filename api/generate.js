@@ -1,35 +1,37 @@
-export const config = { runtime: 'edge' };
+export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-export default async function handler(req) {
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { prompt } = await req.json();
+    const { prompt } = req.body;
     if (!prompt) {
-      return new Response(JSON.stringify({ error: 'Prompt is required' }), { status: 400 });
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'API key not configured. Add ANTHROPIC_API_KEY in Vercel environment variables.' });
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       }),
@@ -37,26 +39,21 @@ export default async function handler(req) {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      return new Response(
-        JSON.stringify({ error: err?.error?.message || 'Generation failed' }),
-        { status: response.status, headers: { 'Access-Control-Allow-Origin': '*' } }
-      );
+      return res.status(response.status).json({
+        error: err?.error?.message || 'Anthropic API error'
+      });
     }
 
     const data = await response.json();
     const text = data.content?.map(b => b.text || '').join('') || '';
 
-    return new Response(JSON.stringify({ result: text }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    if (!text) {
+      return res.status(500).json({ error: 'Empty response from API. Please try again.' });
+    }
+
+    return res.status(200).json({ result: text });
+
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err.message || 'Unexpected error' }),
-      { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
-    );
+    return res.status(500).json({ error: err.message || 'Unexpected server error' });
   }
 }
