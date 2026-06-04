@@ -795,8 +795,9 @@ FORMATTING RULES:
 3. Then write the sections in this order: CONTACT INFORMATION, PROFESSIONAL SUMMARY, WORK EXPERIENCE, EDUCATION, SKILLS.
 4. Section headers must be in ALL CAPS.
 5. Under CONTACT INFORMATION, list email and phone number — NOT at the top with the name.
-6. Plain text only — no markdown, no asterisks, no hashtags, no dashes as separators.
-7. Minimum 400 words.
+6. For bullet points under work experience and skills, start each bullet with "- " (dash space)
+7. Plain text only — no markdown, no asterisks, no hashtags
+8. Minimum 400 words. Include ALL details provided — do not skip any information.
 
 Candidate details:
 Name: ${name}
@@ -1036,38 +1037,491 @@ function onPaymentSuccess(type, reference) {
 
 // ─── Professional PDF generation — no branding, clean layouts ────
 function generatePDF(title, content, type) {
-  const { jsPDF } = window.jspdf;
   const tpl = (type === 'cv') ? (selectedTemplate['cv'] || 'classic') : 'classic';
   const safe = sanitizeForPDF(content);
-  const lines = safe.split('\n');
 
-  // Parse structured sections from Claude output
-  // Sections are lines in ALL CAPS (section headers), dashes, and body text
-  const parsed = [];
-  lines.forEach(raw => {
-    const line = raw.trimEnd();
-    if (!line.trim()) { parsed.push({ type: 'blank' }); return; }
-    if (/^-{3,}$/.test(line.trim())) { parsed.push({ type: 'rule' }); return; }
-    if (/^[A-Z][A-Z\s\/&\-]{2,}$/.test(line.trim()) && line.trim().length >= 3 && line.trim().length <= 50) {
-      parsed.push({ type: 'heading', text: line.trim() }); return;
-    }
-    parsed.push({ type: 'body', text: line });
-  });
+  if (type === 'cover') return buildCoverLetter(safe);
 
-  // Extract candidate name — first non-empty body line after CONTACT INFORMATION
+  // Use new structured parser
+  const parsed = parseCVContent(safe, '');
+
+  // Extract candidate name — very first non-empty body line
   let candidateName = '';
-  for (let i = 0; i < parsed.length; i++) {
-    if (parsed[i].type === 'body' && parsed[i].text.trim().length > 1) {
-      candidateName = sanitizeForPDF(parsed[i].text.trim());
+  for (const tk of parsed) {
+    if (tk.kind === 'body' && tk.text.trim().length > 1) {
+      candidateName = tk.text.trim();
       break;
     }
   }
 
-  if (type === 'cover') return buildCoverLetter(safe);
-  if (tpl === 'classic') return buildClassic(parsed, candidateName, type);
-  if (tpl === 'modern')  return buildModern(parsed, candidateName, type);
-  if (tpl === 'bold')    return buildBold(parsed, candidateName, type);
+  if (tpl === 'modern') return buildModern(parsed, candidateName, type);
+  if (tpl === 'bold')   return buildBold(parsed, candidateName, type);
   return buildClassic(parsed, candidateName, type);
+}
+
+// ── COVER LETTER PDF — address block format, no lines ─────────────
+function buildCoverLetter(safeContent) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, lm = 24, rm = 24, cw = pageW - lm - rm;
+  let y = 24;
+
+  const lines = safeContent.split('\n');
+  lines.forEach(raw => {
+    const line = raw.trimEnd();
+    y = checkY(doc, y, 6, 'classic');
+
+    if (!line.trim()) { y += 4; return; }
+
+    // Subject line — bold
+    if (/^(Subject|RE|Re|Application for)/i.test(line.trim())) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      const wl = doc.splitTextToSize(line, cw);
+      wl.forEach(l => { doc.text(l, lm, y); y += 6; });
+      y += 2; return;
+    }
+
+    // Greeting / closing — bold
+    if (/^(Dear |Yours |Kind regards|Sincerely|Regards)/i.test(line.trim())) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(line, lm, y); y += 6; return;
+    }
+
+    // Normal body
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+    doc.setTextColor(30, 41, 59);
+    const wrapped = doc.splitTextToSize(line, cw);
+    wrapped.forEach(wl => { y = checkY(doc, y, 6, 'classic'); doc.text(wl, lm, y); y += 6; });
+  });
+  return doc;
+}
+
+// ── Shared page helpers ─────────────────────────────────────────
+function newPage(doc, tpl, sideW) {
+  doc.addPage();
+  if (tpl === 'modern') {
+    doc.setFillColor(31, 41, 70); doc.rect(0, 0, sideW || 62, 297, 'F');
+    doc.setFillColor(56, 189, 248); doc.rect(0, 0, 4, 297, 'F');
+  }
+  if (tpl === 'bold') {
+    doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 6, 'F');
+    doc.setFillColor(56, 189, 248); doc.rect(0, 5, 210, 2, 'F');
+  }
+  return tpl === 'bold' ? 16 : 18;
+}
+function checkY(doc, y, needed, tpl, sideW) {
+  if (y + needed > 278) { y = newPage(doc, tpl, sideW); }
+  return y;
+}
+
+// Draw a section-end thin rule
+function drawRule(doc, lm, rm, y, pageW) {
+  doc.setDrawColor(160, 170, 180);
+  doc.setLineWidth(0.35);
+  doc.line(lm, y, pageW - rm, y);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// PARSER: turns raw Claude text into structured tokens
+// ─────────────────────────────────────────────────────────────────
+function parseCVContent(safe, candidateName) {
+  const rawLines = safe.split('\n');
+  const tokens = [];
+
+  rawLines.forEach(raw => {
+    const line = raw.trimEnd();
+    const t = line.trim();
+
+    if (!t) { tokens.push({ kind: 'blank' }); return; }
+
+    // Pure section heading: all caps, 3-40 chars, not a full sentence
+    if (/^[A-Z][A-Z\s\/&\-]{2,39}$/.test(t) && !t.includes('.') && t.length <= 42) {
+      tokens.push({ kind: 'heading', text: t }); return;
+    }
+
+    // Raw dash separator line — ignored
+    if (/^[-–—]{3,}$/.test(t)) { tokens.push({ kind: 'rule' }); return; }
+
+    // Bullet line
+    if (/^[-*•]\s/.test(t)) {
+      tokens.push({ kind: 'bullet', text: t.replace(/^[-*•]\s*/, '') }); return;
+    }
+
+    tokens.push({ kind: 'body', text: line });
+  });
+
+  return tokens;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// TEMPLATE 1: CLASSIC  (matches the attached sample image exactly)
+// Name large centred, title row, contact row, then sections with
+// bold heading + underline rule, job title bold, company italic,
+// dates right-aligned, bullet points, justified body text
+// ─────────────────────────────────────────────────────────────────
+function buildClassic(parsed, candidateName, type) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, lm = 18, rm = 18, cw = pageW - lm - rm;
+  let y = 20;
+
+  // ── 1. Name ──────────────────────────────────────────────────
+  if (candidateName) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(26);
+    doc.setTextColor(10, 10, 10);
+    doc.text(candidateName.toUpperCase(), pageW / 2, y, { align: 'center' });
+    y += 9;
+  }
+
+  // ── 2. Scan tokens for contact block (lines before first heading) ──
+  // Contact info goes on one centred line under the name
+  const contactLines = [];
+  let hitFirstHeading = false;
+  for (const tk of parsed) {
+    if (tk.kind === 'heading') { hitFirstHeading = true; break; }
+    if (tk.kind === 'body' && tk.text.trim() && tk.text.trim() !== candidateName) {
+      contactLines.push(sanitizeForPDF(tk.text.trim()));
+    }
+  }
+
+  // Second body line (role/tagline) — print centred bold
+  if (contactLines.length > 0) {
+    const roleLine = contactLines[0];
+    // If it looks like a role (no @ or digits runs), show as subtitle
+    if (!/\d{5,}|@/.test(roleLine)) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(30, 30, 30);
+      doc.text(roleLine, pageW / 2, y, { align: 'center' });
+      y += 6;
+    }
+  }
+
+  // Remaining contact lines merged into one row with | separators
+  const contactDetails = contactLines.filter(l => /\d|@|linkedin|http/i.test(l));
+  if (contactDetails.length) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(60, 60, 60);
+    const contactStr = contactDetails.join('  |  ');
+    const cLines = doc.splitTextToSize(contactStr, cw);
+    cLines.forEach(cl => { doc.text(cl, pageW / 2, y, { align: 'center' }); y += 5; });
+    y += 2;
+  }
+
+  // ── 3. Body sections ─────────────────────────────────────────
+  let afterFirstHeading = false;
+  let prevKind = null;
+  // Track date pattern for right-alignment
+  const datePat = /(\w+ \d{4}|\d{4})\s*([-–—to]+\s*(\w+ \d{4}|\d{4}|present|current))?/i;
+
+  parsed.forEach((tk, i) => {
+    if (tk.kind === 'blank') { if (afterFirstHeading) y += 2; return; }
+    if (tk.kind === 'rule') return;
+
+    // ── SECTION HEADING ──
+    if (tk.kind === 'heading') {
+      // rule before heading (not before first)
+      if (afterFirstHeading) { y += 4; drawRule(doc, lm, rm, y, pageW); y += 6; }
+      else { y += 4; }
+      y = checkY(doc, y, 14, 'classic');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11.5);
+      doc.setTextColor(10, 10, 10);
+      doc.text(tk.text, lm, y);
+      y += 2;
+      // underline rule right after heading text
+      drawRule(doc, lm, rm, y, pageW);
+      y += 6;
+      afterFirstHeading = true;
+      prevKind = 'heading';
+      return;
+    }
+
+    if (!afterFirstHeading) return; // skip contact lines (already rendered above)
+
+    // ── BULLET ──
+    if (tk.kind === 'bullet') {
+      y = checkY(doc, y, 6, 'classic');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(40, 40, 40);
+      const bl = doc.splitTextToSize(tk.text, cw - 7);
+      bl.forEach((b, bi) => {
+        y = checkY(doc, y, 5.5, 'classic');
+        doc.text('\u2022', lm + 1, y + bi * 5.4);
+        const isLast = bi === bl.length - 1;
+        if (!isLast && b.trim().length > 15) {
+          doc.text(b, lm + 6, y + bi * 5.4, { maxWidth: cw - 7, align: 'justify' });
+        } else {
+          doc.text(b, lm + 6, y + bi * 5.4);
+        }
+      });
+      y += bl.length * 5.4;
+      prevKind = 'bullet';
+      return;
+    }
+
+    // ── BODY line ──
+    if (tk.kind === 'body') {
+      const t = tk.text.trim();
+      if (!t) return;
+      y = checkY(doc, y, 6, 'classic');
+
+      // Detect date range — print right-aligned on same Y as previous line
+      const isDateLine = datePat.test(t) && t.length < 40 && !/^[A-Z]{4,}/.test(t);
+
+      // Detect job title: short, title-case, follows a heading, no punctuation
+      const isJobTitle = prevKind === 'heading' || prevKind === 'company';
+      const isCompany  = prevKind === 'jobtitle';
+
+      // Heuristic classification
+      const wordCount = t.split(/\s+/).length;
+      const isShortLine = wordCount <= 10 && t.length < 60;
+      const startsUpper = /^[A-Z]/.test(t);
+
+      if (isShortLine && startsUpper && !isDateLine && prevKind === 'heading') {
+        // Job title
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(10,10,10);
+        doc.text(t, lm, y); y += 5.8;
+        prevKind = 'jobtitle'; return;
+      }
+
+      if (isShortLine && startsUpper && !isDateLine && prevKind === 'jobtitle') {
+        // Company + dates on same row
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(40,40,40);
+        // Check if next token is a date
+        const nextTk = parsed[i+1];
+        const nextIsDate = nextTk && nextTk.kind === 'body' && datePat.test(nextTk.text.trim()) && nextTk.text.trim().length < 40;
+        doc.text(t, lm, y);
+        if (nextIsDate) {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(10,10,10);
+          doc.text(sanitizeForPDF(nextTk.text.trim()), pageW - rm, y, { align: 'right' });
+          parsed[i+1]._skip = true;
+        }
+        y += 5.8; prevKind = 'company'; return;
+      }
+
+      if (tk._skip) return;
+
+      if (isDateLine && prevKind !== 'company') {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(10,10,10);
+        doc.text(t, pageW - rm, y, { align: 'right' }); y += 5.5;
+        prevKind = 'date'; return;
+      }
+
+      // Normal body text — justified
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40,40,40);
+      const wrapped = doc.splitTextToSize(t, cw);
+      wrapped.forEach((wl, wi) => {
+        y = checkY(doc, y, 5.5, 'classic');
+        const isLast = wi === wrapped.length - 1;
+        if (!isLast && wl.trim().length > 20) {
+          doc.text(wl, lm, y, { maxWidth: cw, align: 'justify' });
+        } else {
+          doc.text(wl, lm, y);
+        }
+        y += 5.5;
+      });
+      prevKind = 'body';
+    }
+  });
+
+  return doc;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// TEMPLATE 2: MODERN  (dark navy sidebar + white main)
+// ─────────────────────────────────────────────────────────────────
+function buildModern(parsed, candidateName, type) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, sideW = 65, mainX = sideW + 8, mainW = pageW - mainX - 14;
+
+  doc.setFillColor(22, 30, 50); doc.rect(0, 0, sideW, 297, 'F');
+  doc.setFillColor(56, 189, 248); doc.rect(0, 0, 4, 297, 'F');
+
+  let sy = 20;
+  // Name in sidebar
+  if (candidateName) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(255, 255, 255);
+    const nls = doc.splitTextToSize(candidateName, sideW - 14);
+    nls.forEach(nl => { doc.text(nl, 8, sy); sy += 7.5; });
+    sy += 3;
+  }
+
+  const sidebarKeys = ['CONTACT', 'SKILLS', 'KEY SKILLS', 'LANGUAGES', 'CERTIFICATIONS', 'REFERENCES', 'INTERESTS'];
+  const sideTokens = [], mainTokens = [];
+  let goSide = false;
+
+  parsed.forEach(tk => {
+    if (tk.kind === 'heading') goSide = sidebarKeys.some(k => tk.text.includes(k));
+    if (tk.kind === 'body' && tk.text.trim() === candidateName) return;
+    if (goSide) sideTokens.push(tk);
+    else mainTokens.push(tk);
+  });
+
+  // Sidebar tokens
+  sideTokens.forEach(tk => {
+    if (tk.kind === 'blank') { sy += 2; return; }
+    if (tk.kind === 'heading') {
+      sy += 4;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(56, 189, 248);
+      doc.text(tk.text, 8, sy); sy += 5;
+      doc.setDrawColor(56, 189, 248); doc.setLineWidth(0.2); doc.line(8, sy, sideW - 4, sy);
+      sy += 4; return;
+    }
+    if (tk.kind === 'body' || tk.kind === 'bullet') {
+      const txt = tk.kind === 'bullet' ? ('• ' + tk.text) : tk.text;
+      const wls = doc.splitTextToSize(sanitizeForPDF(txt), sideW - 14);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(190, 210, 235);
+      wls.forEach(wl => { if (sy < 284) { doc.text(wl, 8, sy); sy += 5; } });
+    }
+  });
+
+  // Main tokens
+  let my = 14, mPrev = null;
+  const datePat2 = /(\w+ \d{4}|\d{4})\s*([-–—to]+\s*(\w+ \d{4}|\d{4}|present|current))?/i;
+  mainTokens.forEach((tk, i) => {
+    if (tk._skip) return;
+    if (tk.kind === 'blank') { my += 2; return; }
+    if (tk.kind === 'rule') return;
+
+    if (tk.kind === 'heading') {
+      if (mPrev) { my += 3; doc.setDrawColor(180,190,200); doc.setLineWidth(0.3); doc.line(mainX, my, pageW-14, my); my += 5; }
+      my = checkY(doc, my, 12, 'modern', sideW);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(22, 30, 50);
+      doc.text(tk.text, mainX, my); my += 2;
+      doc.setDrawColor(56, 189, 248); doc.setLineWidth(0.4); doc.line(mainX, my, pageW-14, my);
+      my += 6; mPrev = 'heading'; return;
+    }
+
+    if (tk.kind === 'bullet') {
+      my = checkY(doc, my, 5.5, 'modern', sideW);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(40,40,40);
+      const bl = doc.splitTextToSize(tk.text, mainW - 5);
+      bl.forEach((b, bi) => { my = checkY(doc, my, 5, 'modern', sideW); doc.text('\u2022', mainX+1, my+bi*5); doc.text(b, mainX+5, my+bi*5, { maxWidth: mainW-6, align: bi===bl.length-1?'left':'justify' }); });
+      my += bl.length * 5; mPrev = 'bullet'; return;
+    }
+
+    if (tk.kind === 'body') {
+      const t = tk.text.trim(); if (!t) return;
+      my = checkY(doc, my, 6, 'modern', sideW);
+      const isDate = datePat2.test(t) && t.length < 40;
+      const wordCount = t.split(/\s+/).length;
+      const isShort = wordCount <= 10 && t.length < 60 && /^[A-Z]/.test(t);
+      if (isShort && !isDate && mPrev === 'heading') {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(15,23,42);
+        doc.text(t, mainX, my); my += 5.5; mPrev = 'jobtitle'; return;
+      }
+      if (isShort && !isDate && mPrev === 'jobtitle') {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(60,60,60);
+        doc.text(t, mainX, my);
+        const nt = mainTokens[i+1];
+        if (nt && nt.kind==='body' && datePat2.test(nt.text.trim()) && nt.text.trim().length<40) {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(22,30,50);
+          doc.text(sanitizeForPDF(nt.text.trim()), pageW-14, my, { align: 'right' });
+          mainTokens[i+1]._skip = true;
+        }
+        my += 5.5; mPrev = 'company'; return;
+      }
+      if (tk._skip) return;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(40,40,40);
+      const wls = doc.splitTextToSize(t, mainW);
+      wls.forEach((wl, wi) => { my = checkY(doc, my, 5, 'modern', sideW); doc.text(wl, mainX, my, (wi===wls.length-1||wl.trim().length<15)?{}:{maxWidth:mainW,align:'justify'}); my += 5.2; });
+      mPrev = 'body';
+    }
+  });
+  return doc;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// TEMPLATE 3: BOLD  (dark header band + clean white body)
+// ─────────────────────────────────────────────────────────────────
+function buildBold(parsed, candidateName, type) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, lm = 18, rm = 18, cw = pageW - lm - rm;
+
+  // Header band
+  doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageW, 40, 'F');
+  doc.setFillColor(56, 189, 248); doc.rect(0, 38.5, pageW, 2.5, 'F');
+
+  // Name in header
+  if (candidateName) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(255,255,255);
+    doc.text(candidateName.toUpperCase(), lm, 20);
+  }
+  // Contact line in header
+  const headerContacts = [];
+  for (const tk of parsed) {
+    if (tk.kind === 'heading') break;
+    if (tk.kind === 'body' && tk.text.trim() && tk.text.trim() !== candidateName) {
+      headerContacts.push(sanitizeForPDF(tk.text.trim()));
+    }
+  }
+  if (headerContacts.length) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(147,197,253);
+    doc.text(headerContacts.join('  |  '), lm, 32, { maxWidth: cw });
+  }
+
+  let y = 50, bPrev = null;
+  const datePat3 = /(\w+ \d{4}|\d{4})\s*([-–—to]+\s*(\w+ \d{4}|\d{4}|present|current))?/i;
+  parsed.forEach((tk, i) => {
+    if (tk._skip) return;
+    if (tk.kind === 'blank') { if (bPrev) y += 2; return; }
+    if (tk.kind === 'rule') return;
+    // skip contact lines before first heading
+    if (tk.kind === 'body' && !bPrev && (tk.text.trim() === candidateName || headerContacts.includes(sanitizeForPDF(tk.text.trim())))) return;
+
+    if (tk.kind === 'heading') {
+      if (bPrev) { y += 4; drawRule(doc, lm, rm, y, pageW); y += 5; }
+      y = checkY(doc, y, 14, 'bold');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(15,23,42);
+      doc.text(tk.text, lm, y); y += 2;
+      drawRule(doc, lm, rm, y, pageW); y += 6;
+      bPrev = 'heading'; return;
+    }
+
+    if (tk.kind === 'bullet') {
+      y = checkY(doc, y, 5.5, 'bold');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40,40,40);
+      const bl = doc.splitTextToSize(tk.text, cw - 7);
+      bl.forEach((b, bi) => { y = checkY(doc, y, 5.5, 'bold'); doc.text('\u2022', lm+1, y+bi*5.4); doc.text(b, lm+6, y+bi*5.4, {maxWidth:cw-7, align:bi===bl.length-1?'left':'justify'}); });
+      y += bl.length * 5.4; bPrev = 'bullet'; return;
+    }
+
+    if (tk.kind === 'body') {
+      const t = tk.text.trim(); if (!t) return;
+      y = checkY(doc, y, 6, 'bold');
+      const isDate = datePat3.test(t) && t.length < 40;
+      const isShort = t.split(/\s+/).length <= 10 && t.length < 60 && /^[A-Z]/.test(t);
+      if (isShort && !isDate && bPrev === 'heading') {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(15,23,42);
+        doc.text(t, lm, y); y += 5.8; bPrev = 'jobtitle'; return;
+      }
+      if (isShort && !isDate && bPrev === 'jobtitle') {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(50,50,50);
+        doc.text(t, lm, y);
+        const nt = parsed[i+1];
+        if (nt && nt.kind==='body' && datePat3.test(nt.text.trim()) && nt.text.trim().length<40) {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(15,23,42);
+          doc.text(sanitizeForPDF(nt.text.trim()), pageW-rm, y, { align:'right' });
+          parsed[i+1]._skip = true;
+        }
+        y += 5.8; bPrev = 'company'; return;
+      }
+      if (tk._skip) return;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40,40,40);
+      const wls = doc.splitTextToSize(t, cw);
+      wls.forEach((wl, wi) => { y = checkY(doc, y, 5.5, 'bold'); doc.text(wl, lm, y, (wi===wls.length-1||wl.trim().length<15)?{}:{maxWidth:cw,align:'justify'}); y += 5.5; });
+      bPrev = 'body';
+    }
+  });
+  return doc;
 }
 
 // ── COVER LETTER PDF — address block format, no lines ─────────────
