@@ -969,6 +969,18 @@ async function startGenerate(type) {
   try {
     const content = await callGenerate(prompt);
     clearInterval(ticker);
+
+    // DEBUG — log raw content and parsed tokens to console
+    console.log('=== RAW CONTENT ===');
+    console.log(content);
+    console.log('=== FIRST 500 CHARS ===');
+    console.log(content.substring(0, 500));
+    const safe = sanitizeForPDF(content);
+    const parsed = parseCVContent(safe);
+    console.log('=== PARSED TOKENS (first 20) ===');
+    console.log(JSON.stringify(parsed.slice(0, 20), null, 2));
+    console.log('=== TOTAL TOKENS ===', parsed.length);
+
     generatedContent[type] = content;
     if (bar) bar.style.width = '100%';
     await new Promise(r => setTimeout(r, 300));
