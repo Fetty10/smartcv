@@ -856,49 +856,123 @@ Write the full professional cover letter now. 300-400 words. No horizontal lines
     const name = document.getElementById('ip-name')?.value.trim() || '';
     const job = document.getElementById('ip-job')?.value.trim() || '';
     if (!name || !job) return null;
-    return `You are an expert interview coach. Create a comprehensive interview prep guide. Structure: 1) ABOUT YOUR INTERVIEW, 2) TOP 20 INTERVIEW QUESTIONS with strong model answers, 3) SALARY NEGOTIATION TIPS, 4) GENERAL INTERVIEW TIPS. Number each question. Plain text only.
+    return `You are an expert interview coach. Write a comprehensive interview prep guide for ${name} applying for ${job}.
+
+STRICT FORMATTING RULES - YOU MUST FOLLOW THESE:
+- NO markdown whatsoever. No #, ##, ###, **, *, |, >, backticks, or any markdown symbols.
+- Use PLAIN TEXT ONLY.
+- Section titles must be in ALL CAPS with no special characters before or after them.
+- Questions must be numbered like: QUESTION 1, QUESTION 2, etc. on their own line.
+- Answers follow immediately below each question as normal paragraphs.
+- Use "- " (dash space) for bullet points only in the tips sections.
+
+STRUCTURE:
+ABOUT YOUR INTERVIEW
+[2-3 sentences about what to expect]
+
+TOP 20 INTERVIEW QUESTIONS AND ANSWERS
+
+QUESTION 1
+[question text]
+Answer: [model answer in 3-5 sentences]
+
+QUESTION 2
+[question text]
+Answer: [model answer in 3-5 sentences]
+
+[continue for all 20 questions]
+
+SALARY NEGOTIATION TIPS
+- [tip 1]
+- [tip 2]
+[etc]
+
+GENERAL INTERVIEW TIPS
+- [tip 1]
+- [tip 2]
+[etc]
 
 Candidate: ${name}
-Job & Company: ${job}
+Job and Company: ${job}
 Industry: ${document.getElementById('ip-industry')?.value.trim() || ''}
 Experience Level: ${document.getElementById('ip-level')?.value || ''}
 Job Description: ${document.getElementById('ip-jd')?.value.trim() || 'Not provided'}
 Main Worry: ${document.getElementById('ip-worry')?.value.trim() || 'None'}
 
-Write the full interview prep guide now.`;
+Write the full guide now. NO MARKDOWN. Plain text only.`;
   }
   if (type === 'linkedin') {
     const name = document.getElementById('li-name')?.value.trim() || '';
     const title = document.getElementById('li-title')?.value.trim() || '';
     if (!name || !title) return null;
-    return `You are a LinkedIn profile expert. Rewrite and optimize this person's LinkedIn profile. Sections: 1) OPTIMIZED HEADLINE, 2) ABOUT / SUMMARY, 3) EXPERIENCE BULLET POINTS, 4) RECOMMENDED SKILLS, 5) PROFILE TIPS. Plain text only.
+    return `You are a LinkedIn profile expert. Write an optimized LinkedIn profile guide for ${name}.
+
+STRICT FORMATTING RULES - YOU MUST FOLLOW THESE:
+- NO markdown whatsoever. No #, ##, ###, **, *, |, >, backticks, or any markdown symbols.
+- Use PLAIN TEXT ONLY.
+- Section titles must be in ALL CAPS on their own line.
+- Use "- " (dash space) for bullet points only.
+
+STRUCTURE:
+OPTIMIZED HEADLINE
+[Write the headline text here - max 220 characters]
+
+ABOUT / SUMMARY
+[Write the full About section here - 3-5 paragraphs]
+
+EXPERIENCE BULLET POINTS
+- [achievement bullet 1]
+- [achievement bullet 2]
+[etc - write complete bullet points, do not split them across lines]
+
+RECOMMENDED SKILLS
+- [skill 1]
+- [skill 2]
+[etc]
+
+PROFILE TIPS
+- [tip 1]
+- [tip 2]
+[etc]
 
 Name: ${name}
 Title / Target Role: ${title}
 Industry: ${document.getElementById('li-industry')?.value.trim() || ''}
 Current Headline: ${document.getElementById('li-headline')?.value.trim() || 'None'}
 Current Summary: ${document.getElementById('li-summary')?.value.trim() || 'None'}
-Skills & Accomplishments: ${document.getElementById('li-skills')?.value.trim() || ''}
+Skills and Accomplishments: ${document.getElementById('li-skills')?.value.trim() || ''}
 Opportunities Wanted: ${document.getElementById('li-opps')?.value.trim() || ''}
 
-Write the full optimized LinkedIn profile content now.`;
+Write the full profile guide now. NO MARKDOWN. Plain text only.`;
   }
   return null;
 }
 
-// ─── Sanitize text for jsPDF (strip chars it can't handle) ──────
+// ─── Sanitize text for jsPDF ────────────────────────────────────
 function sanitizeForPDF(text) {
   return text
-    .replace(/\u20A6/g, 'NGN')          // ₦ → NGN
-    .replace(/[\u2018\u2019]/g, "'")     // curly single quotes
-    .replace(/[\u201C\u201D]/g, '"')     // curly double quotes
-    .replace(/\u2014/g, '--')            // em dash
-    .replace(/\u2013/g, '-')             // en dash
-    .replace(/\u2026/g, '...')           // ellipsis
-    .replace(/\u2022/g, '*')             // bullet
+    // Strip markdown headings: ##, ###, #### etc at start of line
+    .replace(/^#{1,6}\s*/gm, '')
+    // Strip bold/italic markers: **, __, *, _
+    .replace(/\*\*|__|\*|_(?=[^\s])/g, '')
+    // Strip pipe table separators
+    .replace(/\|/g, ' ')
+    // Strip backticks
+    .replace(/`/g, '')
+    // Strip blockquotes
+    .replace(/^>\s*/gm, '')
+    // Strip horizontal rules
+    .replace(/^[-*_]{3,}\s*$/gm, '')
+    // Unicode replacements
+    .replace(/\u20A6/g, 'NGN')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2014/g, '--')
+    .replace(/\u2013/g, '-')
+    .replace(/\u2026/g, '...')
+    .replace(/\u2022/g, '-')
     .replace(/[^\x00-\x7F]/g, function(c) {
-      // replace any remaining non-ASCII with closest ASCII or empty
-      const map = { '\u00e9':'e','\u00e8':'e','\u00ea':'e','\u00eb':'e','\u00e0':'a','\u00e2':'a','\u00f4':'o','\u00f9':'u','\u00fb':'u','\u00fc':'u','\u00ef':'i','\u00ee':'i','\u00e7':'c','\u00f1':'n' };
+      const map = {'\u00e9':'e','\u00e8':'e','\u00ea':'e','\u00eb':'e','\u00e0':'a','\u00e2':'a','\u00f4':'o','\u00f9':'u','\u00fb':'u','\u00fc':'u','\u00ef':'i','\u00ee':'i','\u00e7':'c','\u00f1':'n'};
       return map[c] || '';
     });
 }
