@@ -1109,7 +1109,8 @@ function escH(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-
+// ─── Generate → show preview ──────────────────────────────────────
+async function startGenerate(type) {
   hideError(type);
   const prompt = buildPrompt(type);
   if (!prompt) { showError(type, 'Please fill in all required fields marked with *'); return; }
