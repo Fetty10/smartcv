@@ -165,12 +165,34 @@ footer a{color:var(--sky-light);text-decoration:none}
 .preview-step{padding:4px 0}
 .preview-step h3{font-family:'Sora',sans-serif;font-weight:800;font-size:1.2rem;color:var(--navy);margin-bottom:4px}
 .preview-step .preview-note{font-size:.82rem;color:var(--gray);margin-bottom:16px}
-.preview-wrap{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid #e2eaf3;max-height:380px}
-/* Top portion: clear so user sees real content */
-.preview-content{background:#fff;padding:24px;font-size:.82rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:380px;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-mask-image:linear-gradient(to bottom,black 0%,black 38%,transparent 68%);mask-image:linear-gradient(to bottom,black 0%,black 38%,transparent 68%)}
-/* Single diagonal watermark across the blurred area */
-.preview-watermark{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;top:35%}
-.wm-text{font-family:'Sora',sans-serif;font-weight:800;font-size:1.3rem;color:rgba(14,165,233,0.45);transform:rotate(-30deg);letter-spacing:.12em;white-space:nowrap;text-shadow:none}
+.preview-wrap{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid #e2eaf3;background:#fff;max-height:480px}
+/* Content: fully clear on top ~60%, fades gently at bottom */
+.preview-content{
+  background:#fff;padding:28px 26px 0;
+  font-size:.83rem;line-height:1.8;color:var(--text);
+  white-space:pre-wrap;word-break:break-word;
+  max-height:480px;overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  -webkit-mask-image:linear-gradient(to bottom,black 0%,black 55%,rgba(0,0,0,0.5) 75%,transparent 92%);
+  mask-image:linear-gradient(to bottom,black 0%,black 55%,rgba(0,0,0,0.5) 75%,transparent 92%);
+  font-family:'Georgia',serif;
+}
+/* Style name/heading lines in preview */
+.preview-content .pv-name{font-size:1.1rem;font-weight:700;text-align:center;color:#0a0a0a;margin-bottom:4px;display:block;font-family:'Sora',sans-serif}
+.preview-content .pv-heading{font-size:.85rem;font-weight:700;color:#1e40af;margin-top:10px;margin-bottom:2px;display:block;text-transform:uppercase;letter-spacing:.04em;font-family:'Sora',sans-serif}
+.preview-content .pv-contact{font-size:.78rem;text-align:center;color:#555;margin-bottom:8px;display:block}
+/* Watermark: diagonal across entire preview, low opacity so content stays readable */
+.preview-watermark{
+  position:absolute;inset:0;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  transform:rotate(-28deg);
+}
+.wm-text{
+  font-family:'Sora',sans-serif;font-weight:900;
+  font-size:1.6rem;color:rgba(14,165,233,0.18);
+  letter-spacing:.18em;white-space:nowrap;
+  text-transform:uppercase;
+}
 .preview-cta{margin-top:18px;background:var(--sky-ultra);border:1.5px solid var(--sky-light);border-radius:14px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .preview-cta .cta-text h4{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--navy);margin-bottom:3px}
 .preview-cta .cta-text p{font-size:.8rem;color:var(--gray)}
@@ -1023,7 +1045,71 @@ async function callGenerate(prompt) {
 }
 
 // ─── STEP 1: Generate → show preview ─────────────────────────────
-async function startGenerate(type) {
+// ─── Format raw content into styled HTML for preview ─────────────
+function formatPreview(content, type) {
+  const safe = sanitizeForPDF(content);
+  const lines = safe.split('\n');
+  let html = '';
+  let isFirst = true;
+
+  lines.forEach(raw => {
+    const line = raw.trim();
+    if (!line) { html += '<br>'; return; }
+
+    // Detect ALL CAPS section heading
+    const upperLine = line.toUpperCase();
+    const isHeading = KNOWN_SECTIONS.some(s => s.toUpperCase() === upperLine) ||
+                      (/^[A-Z][A-Z\s\/&\-]{2,49}$/.test(line) && !/[a-z]/.test(line) && line.length <= 50);
+
+    if (isHeading) {
+      html += `<span class="pv-heading">${escH(line)}</span>`;
+      return;
+    }
+
+    // First non-empty line = name (for CV)
+    if (isFirst && type === 'cv') {
+      html += `<span class="pv-name">${escH(line)}</span>`;
+      isFirst = false;
+      return;
+    }
+    isFirst = false;
+
+    // Contact-looking line (short, has @ or digits)
+    if (line.length < 120 && /\d|@|http/i.test(line) && line.split(' ').length <= 10) {
+      html += `<span class="pv-contact">${escH(line)}</span>`;
+      return;
+    }
+
+    // Bullet line
+    if (/^[-*\u2022]\s/.test(line)) {
+      html += `<span style="display:block;padding-left:14px;text-indent:-10px;margin:1px 0">&#8226; ${escH(line.replace(/^[-*\u2022]\s*/,''))}</span>`;
+      return;
+    }
+
+    // Question line (QUESTION N or Q:)
+    if (/^QUESTION\s+\d+/i.test(line)) {
+      html += `<span style="display:block;font-weight:700;color:#1e293b;margin-top:8px">${escH(line)}</span>`;
+      return;
+    }
+
+    // Answer label
+    if (/^Answer:/i.test(line)) {
+      html += `<span style="display:block;font-weight:600;color:#374151;margin-top:2px">${escH(line)}</span>`;
+      return;
+    }
+
+    // Normal body line
+    html += `<span style="display:block;margin:1px 0">${escH(line)}</span>`;
+  });
+
+  return html;
+}
+
+function escH(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+
   hideError(type);
   const prompt = buildPrompt(type);
   if (!prompt) { showError(type, 'Please fill in all required fields marked with *'); return; }
@@ -1047,9 +1133,9 @@ async function startGenerate(type) {
     if (bar) bar.style.width = '100%';
     await new Promise(r => setTimeout(r, 300));
 
-    // populate blurred preview
+    // populate formatted preview
     const prev = document.getElementById(type + '-preview-content');
-    if (prev) prev.textContent = content;
+    if (prev) prev.innerHTML = formatPreview(content, type);
 
     showStep(type, 'preview');
   } catch (err) {
